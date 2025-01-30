@@ -1,17 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using SurveyBasket;
 using SurveyBasket.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var connectionString = builder.Configuration.GetConnectionString("DefualtConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(connectionString));
+builder.Services.AddAllDependacies(builder.Configuration);
 
 var app = builder.Build();
 
