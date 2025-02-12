@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore.Internal;
+using SurveyBasket.Contracts.Polls;
 
 namespace SurveyBasket.Mapping;
 
@@ -7,6 +8,7 @@ public class MappingConfigrations : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        throw new NotImplementedException();
+        config.NewConfig<Poll, PollsResponse>()
+                  .Map(dest => dest.Summary, src => src.Summary);
     }
 }

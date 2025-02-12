@@ -4,7 +4,7 @@ using SurveyBasket.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAllDependacies(builder.Configuration);
+builder.Services.AddAllDependencies(builder.Configuration);
 
 var app = builder.Build();
 
@@ -18,6 +18,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers();
 
