@@ -1,5 +1,6 @@
 ﻿global using SurveyBasket.Models;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using SurveyBasket.Contracts.Auth;
 global using SurveyBasket.Contracts.Polls;

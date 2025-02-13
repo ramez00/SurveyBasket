@@ -26,7 +26,7 @@ public static class Dependencies
                 .AddDataBaseConfig(connectionString)
                 .AddIdentityConfig()
                 .AddSingleton<IJwtProvider, JwtProvider>()
-                .AddAuthConfig()
+                .AddAuthConfig(configuration)
                 .AddScoped<IPollServices, PollServices>()
                 .AddScoped<IAuthService, AuthService>()
                 .AddFluentValidationConfig();
@@ -68,8 +68,11 @@ public static class Dependencies
         return services;
     }
 
-    private static IServiceCollection AddAuthConfig(this IServiceCollection services)
+    private static IServiceCollection AddAuthConfig(this IServiceCollection services,IConfiguration configuration)
     {
+
+        var jwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
+
             services.AddAuthentication(Options =>
             {
                 Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -84,12 +87,20 @@ public static class Dependencies
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("LQl5vdJD7eFbb3E9ohJRbaCwVOpseRrF")),
-                    ValidIssuer = "WebApp",
-                    ValidAudience = "WebApp Users"
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
+                    ValidIssuer = jwtSettings?.Issuer,
+                    ValidAudience = jwtSettings?.Audience,
                 };
             });
-        
+
+        // services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+        // to add validation regarding OPtions load at satrt 
+        services.AddOptions<JwtOptions>()
+           .BindConfiguration(JwtOptions.SectionName)
+           .ValidateDataAnnotations()  // to validate all dataAnotaion
+           .ValidateOnStart();         // to Validate once Start App
+
         return services;
     }
 }
