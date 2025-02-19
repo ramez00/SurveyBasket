@@ -8,3 +8,4 @@ global using SurveyBasket.Services;
 global using FluentValidation;
 global using Mapster;
 global using FluentValidation.AspNetCore;
+global using SurveyBasket.Constants;

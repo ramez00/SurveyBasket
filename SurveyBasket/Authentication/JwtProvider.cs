@@ -34,6 +34,32 @@ public class JwtProvider(IOptions<JwtOptions> jwtOption) : IJwtProvider
         );
 
         return (new JwtSecurityTokenHandler().WriteToken(jwt), expiredIn);
+    }
+
+    public string? ValidateToken(string token)
+    {
+        var TokenHandler = new JwtSecurityTokenHandler();
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
+
+        try
+        {
+            TokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                IssuerSigningKey = securityKey,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ClockSkew = TimeSpan.Zero, // To make Token Expired when time Exceed 
+            },out SecurityToken _validatedToken);
+
+            var JwtToken = (JwtSecurityToken)_validatedToken;
+
+            return JwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.Sub).Value;
+        }
+        catch
+        {
+
+            return null;
+        }
 
     }
 }
