@@ -6,6 +6,8 @@ using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Persistence;
 
 namespace SurveyBasket.Controllers;
+
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class PollsController(IPollServices polls) : ControllerBase
@@ -21,7 +23,6 @@ public class PollsController(IPollServices polls) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize]
     public async Task<IActionResult> Get(int id,CancellationToken token)
     {
         var poll = await _pollService.GetByIdAsync(id,token);
@@ -37,14 +38,14 @@ public class PollsController(IPollServices polls) : ControllerBase
     {
         var poll = pollsRequest.Adapt<Poll>();
         await _pollService.AddAsync(poll,token);
-        return Ok(poll);
+        return Ok(poll.Adapt<PollsResponse>());
     }
 
-    [HttpPut("")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id,Poll poll,CancellationToken token)
     {
         await _pollService.UpdateAsync(id, poll,token);
-        return Ok(poll);
+        return Ok(poll.Adapt<PollsResponse>());
     }
 
     [HttpDelete]

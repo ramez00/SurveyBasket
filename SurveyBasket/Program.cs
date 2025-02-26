@@ -16,6 +16,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.UseCors("Name of Core I defined")
+
 app.UseAuthorization();
 
 app.MapIdentityApi<ApplicationUser>();

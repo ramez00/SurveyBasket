@@ -35,7 +35,7 @@ public class PollServices(ApplicationDbContext context) : IPollServices
         currentPoll.Summary = request.Summary;
 
         _context.Polls.Update(currentPoll);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync(token);
 
         return true;
     }
@@ -48,7 +48,7 @@ public class PollServices(ApplicationDbContext context) : IPollServices
             return false;
 
         _context.Polls.Remove(poll);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(token);
         return true;
     }
 
@@ -60,7 +60,7 @@ public class PollServices(ApplicationDbContext context) : IPollServices
             return false;
 
         currentPoll.IsPublished = !currentPoll.IsPublished;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync(token);
         return true;
 
     }

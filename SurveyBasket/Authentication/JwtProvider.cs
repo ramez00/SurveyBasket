@@ -28,12 +28,12 @@ public class JwtProvider(IOptions<JwtOptions> jwtOption) : IJwtProvider
         var jwt = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
             audience: _jwtOptions.Audience,
-            signingCredentials:signingCredentials,
             claims: claims,
-            expires: DateTime.Today.AddMinutes(expiredIn)
+            expires: DateTime.UtcNow.AddMinutes(expiredIn),
+            signingCredentials: signingCredentials
         );
 
-        return (new JwtSecurityTokenHandler().WriteToken(jwt), expiredIn);
+        return (new JwtSecurityTokenHandler().WriteToken(jwt), expiredIn * 60);
     }
 
     public string? ValidateToken(string token)
@@ -48,6 +48,7 @@ public class JwtProvider(IOptions<JwtOptions> jwtOption) : IJwtProvider
                 IssuerSigningKey = securityKey,
                 ValidateIssuerSigningKey = true,
                 ValidateIssuer = false,
+                ValidateAudience = false,
                 ClockSkew = TimeSpan.Zero, // To make Token Expired when time Exceed 
             },out SecurityToken _validatedToken);
 

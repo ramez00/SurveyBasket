@@ -17,9 +17,20 @@ public static class Dependencies
     {
         services.AddControllers();
 
+        var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+
+        services.AddCors(options =>
+            options.AddPolicy("AllowMyDomain",builder => 
+               builder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()                        // Specific Method ("POST","PUT","GET")
+                    .AllowAnyOrigin()                       // allow all cors 
+                   // .WithOrigins(allowedOrigins!)        // allow Specific Core 
+            )
+        );
+
         var connectionString = configuration.GetConnectionString("DefualtConnection") ??
                                throw new InvalidOperationException("Connection String....");
-
         services
                 .AddSewagerConfig()
                 .AddMapsterConfig()

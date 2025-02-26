@@ -19,14 +19,20 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
         return authRes is null ? BadRequest("Inavlid Email/Password") : Ok(authRes);
     }
 
-    [HttpGet]
-    public IActionResult test()
+    [HttpPost("RefreshToken")]
+    public async Task<IActionResult> RefreshToken(TokenRequest request, CancellationToken cancellationToken)
     {
-        var obj = new
-        {
-            jwtKey = _jwtoption.Key,
-            Issuer = _jwtoption.Issuer,
-        };
-        return Ok(obj);
+        var authRes = await _authService.GetRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
+
+        return authRes is null ? BadRequest("Inavlid Token") : Ok(authRes);
     }
+
+    [HttpPut("Revoke-Refresh-Token")]
+    public async Task<IActionResult> RevokeRefreshToken(TokenRequest request, CancellationToken cancellationToken)
+    {
+        var isRevoked = await _authService.RevokeRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
+
+        return isRevoked ? Ok() : BadRequest("Inavlid Token");
+    }
+
 }

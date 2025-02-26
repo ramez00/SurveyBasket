@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Models;
 
-public class Poll
+public class Poll : AuditableModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
