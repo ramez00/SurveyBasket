@@ -9,3 +9,4 @@ global using FluentValidation;
 global using Mapster;
 global using FluentValidation.AspNetCore;
 global using SurveyBasket.Constants;
+global using SurveyBasket.Abstractions;
