@@ -2,10 +2,13 @@
 
 public interface IPollServices
 {
-    Task<IList<Poll>> GetAllAsync(CancellationToken token = default);
-    Task<Poll?> GetByIdAsync(int Id,CancellationToken token = default);
-    Task<Poll> AddAsync(Poll poll,CancellationToken token = default);
-    Task<bool> UpdateAsync(int id,Poll poll, CancellationToken token = default);
-    Task<bool> DeleteAsync(int Id,CancellationToken token = default);
-    Task<bool> TogglePublishAsync(int Id,CancellationToken token = default);
+    Task<IEnumerable<PollsResponse>> GetAllAsync(CancellationToken token = default);
+    Task<Result<PollsResponse>> GetByIdAsync(int Id,CancellationToken token = default);
+
+    Task<Result<PollsResponse>> AddPollAsync(PollsRequest poll,CancellationToken token = default);
+
+    Task<Result> UpdateAsync(int id, PollsRequest request, CancellationToken token = default);
+
+    Task<Result> DeleteAsync(int Id, CancellationToken token = default);
+    Task<Result> TogglePublishAsync(int Id, CancellationToken token = default);
 }

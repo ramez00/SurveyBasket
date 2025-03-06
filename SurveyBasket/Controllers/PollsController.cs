@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Persistence;
+using System.Reflection;
 
 namespace SurveyBasket.Controllers;
 
@@ -25,44 +26,42 @@ public class PollsController(IPollServices polls) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id,CancellationToken token)
     {
-        var poll = await _pollService.GetByIdAsync(id,token);
+        var res = await _pollService.GetByIdAsync(id,token);
 
-        if(poll is null)
-            return NotFound();
-
-        return Ok(poll.Adapt<PollsResponse>());
+        return res.IsSuccess 
+            ? Ok(res.Value) 
+            : BadRequest(res.Error);
     }
 
     [HttpPost("")]
-    public async Task<IActionResult> add(PollsRequest pollsRequest,CancellationToken token)
+    public async Task<IActionResult> add(PollsRequest request, CancellationToken token)
     {
-        var poll = pollsRequest.Adapt<Poll>();
-        await _pollService.AddAsync(poll,token);
-        return Ok(poll.Adapt<PollsResponse>());
+        var res = await _pollService.AddPollAsync(request, token);
+        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id,Poll poll,CancellationToken token)
+    public async Task<IActionResult> Update(int id, PollsRequest request, CancellationToken token)
     {
-        await _pollService.UpdateAsync(id, poll,token);
-        return Ok(poll.Adapt<PollsResponse>());
+        var resp = await _pollService.UpdateAsync(id, request, token);
+
+        return resp.IsSuccess
+            ? NoContent() 
+            : Problem(statusCode: StatusCodes.Status404NotFound,title: resp.Error.Code,detail:resp.Error.Description);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete(int id,CancellationToken token)
+    public async Task<IActionResult> Delete(int id, CancellationToken token)
     {
-        await _pollService.DeleteAsync(id,token);
-        return Ok();
+        var res = await _pollService.DeleteAsync(id, token);
+        return res.IsSuccess ? Ok() : BadRequest(res.Error);
     }
 
     [HttpPut("TogglePublishAsync/{Id}")]
     public async Task<IActionResult> TogglePublishAsync(int Id, CancellationToken token = default)
     {
-        var isUpdated = await _pollService.TogglePublishAsync(Id,token);
-        
-        if(!isUpdated)
-            return NotFound();
+        var isUpdated = await _pollService.TogglePublishAsync(Id, token);
 
-        return Ok(isUpdated);
+        return isUpdated.IsSuccess ? Ok() : NotFound(isUpdated.Error);
     }
 }

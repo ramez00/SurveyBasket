@@ -16,7 +16,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var authRes = await _authService.GetTokenAsync(request.Email, request.Password,cancellationToken);
 
-        return authRes is null ? BadRequest("Inavlid Email/Password") : Ok(authRes);
+        return authRes.IsSuccess ? Ok(authRes.Value) : BadRequest(authRes.Error);
     }
 
     [HttpPost("RefreshToken")]
@@ -24,7 +24,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var authRes = await _authService.GetRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
 
-        return authRes is null ? BadRequest("Inavlid Token") : Ok(authRes);
+        return authRes.IsSuccess ? Ok() : BadRequest(authRes.Error);
     }
 
     [HttpPut("Revoke-Refresh-Token")]
@@ -32,7 +32,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var isRevoked = await _authService.RevokeRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
 
-        return isRevoked ? Ok() : BadRequest("Inavlid Token");
+        return isRevoked.IsSuccess ? Ok() : BadRequest(isRevoked.Error);
     }
 
 }
