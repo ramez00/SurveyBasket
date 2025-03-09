@@ -29,15 +29,17 @@ public class PollsController(IPollServices polls) : ControllerBase
         var res = await _pollService.GetByIdAsync(id,token);
 
         return res.IsSuccess 
-            ? Ok(res.Value) 
-            : BadRequest(res.Error);
+            ? Ok(res.Value)
+            : res.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpPost("")]
     public async Task<IActionResult> add(PollsRequest request, CancellationToken token)
     {
         var res = await _pollService.AddPollAsync(request, token);
-        return res.IsSuccess ? Ok(res.Value) : BadRequest(res.Error);
+        return res.IsSuccess 
+            ? Ok(res.Value) 
+            : res.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpPut("{id}")]
@@ -46,15 +48,17 @@ public class PollsController(IPollServices polls) : ControllerBase
         var resp = await _pollService.UpdateAsync(id, request, token);
 
         return resp.IsSuccess
-            ? NoContent() 
-            : Problem(statusCode: StatusCodes.Status404NotFound,title: resp.Error.Code,detail:resp.Error.Description);
+            ? NoContent()
+            : resp.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(int id, CancellationToken token)
     {
         var res = await _pollService.DeleteAsync(id, token);
-        return res.IsSuccess ? Ok() : BadRequest(res.Error);
+        return res.IsSuccess 
+            ? Ok()
+            : res.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpPut("TogglePublishAsync/{Id}")]
@@ -62,6 +66,8 @@ public class PollsController(IPollServices polls) : ControllerBase
     {
         var isUpdated = await _pollService.TogglePublishAsync(Id, token);
 
-        return isUpdated.IsSuccess ? Ok() : NotFound(isUpdated.Error);
+        return isUpdated.IsSuccess
+            ? Ok()
+            : isUpdated.ToProblem(StatusCodes.Status400BadRequest);
     }
 }

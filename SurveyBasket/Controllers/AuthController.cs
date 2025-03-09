@@ -16,7 +16,9 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var authRes = await _authService.GetTokenAsync(request.Email, request.Password,cancellationToken);
 
-        return authRes.IsSuccess ? Ok(authRes.Value) : BadRequest(authRes.Error);
+        return authRes.IsSuccess
+            ? Ok(authRes.Value)
+            : authRes.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpPost("RefreshToken")]
@@ -24,7 +26,9 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var authRes = await _authService.GetRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
 
-        return authRes.IsSuccess ? Ok() : BadRequest(authRes.Error);
+        return authRes.IsSuccess
+           ? Ok(authRes.Value)
+           : authRes.ToProblem(StatusCodes.Status400BadRequest);
     }
 
     [HttpPut("Revoke-Refresh-Token")]
@@ -32,7 +36,9 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     {
         var isRevoked = await _authService.RevokeRefreshTokenAsync(request.token, request.refreshToken, cancellationToken);
 
-        return isRevoked.IsSuccess ? Ok() : BadRequest(isRevoked.Error);
+        return isRevoked.IsSuccess
+           ? Ok()
+           : isRevoked.ToProblem(StatusCodes.Status400BadRequest);
     }
 
 }
