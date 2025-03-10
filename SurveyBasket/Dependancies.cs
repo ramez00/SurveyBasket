@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Authentication;
+using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
 using System.Diagnostics.Contracts;
 using System.Reflection;
@@ -40,7 +41,9 @@ public static class Dependencies
                 .AddAuthConfig(configuration)
                 .AddScoped<IPollServices, PollServices>()
                 .AddScoped<IAuthService, AuthService>()
-                .AddFluentValidationConfig();
+                .AddFluentValidationConfig()
+                .AddExceptionHandler<GlobalExceptionHandler>()
+                .AddProblemDetails();
 
         return services;
     }

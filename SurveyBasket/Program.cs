@@ -24,4 +24,6 @@ app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers();
 
+app.UseExceptionHandler();
+
 app.Run();

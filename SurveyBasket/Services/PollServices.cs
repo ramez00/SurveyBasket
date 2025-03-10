@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Http.HttpResults;
 using SurveyBasket.Errors;
+using SurveyBasket.Models;
 using SurveyBasket.Persistence;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,15 +29,28 @@ public class PollServices(ApplicationDbContext context) : IPollServices
     }
         
 
-    public async Task<Result<PollsResponse>> AddPollAsync(PollsRequest poll, CancellationToken token = default)
+    public async Task<Result<PollsResponse>> AddPollAsync(PollsRequest request, CancellationToken token = default)
     {
-        await _context.Polls.AddAsync(poll.Adapt<Poll>(), token);
-        await _context.SaveChangesAsync();
+        var isExisting = await _context.Polls.AnyAsync(x => x.Title == request.Title, cancellationToken: token);
+
+        if (isExisting)
+            return Result.Failure<PollsResponse>(PollErrors.PollDuplicated);
+
+        var poll = request.Adapt<Poll>();
+
+        await _context.Polls.AddAsync(poll, token);
+        await _context.SaveChangesAsync(token);
+
         return Result.Success(poll.Adapt<PollsResponse>());
     }
 
     public async Task<Result> UpdateAsync(int id, PollsRequest request, CancellationToken token = default)
     {
+        var isExisting = await _context.Polls.AnyAsync(x => x.Title == request.Title && x.Id != id, cancellationToken: token);
+
+        if (isExisting)
+            return Result.Failure<PollsResponse>(PollErrors.PollDuplicated);
+
         var currentPoll = await _context.Polls.FindAsync(id, token);
 
         if (currentPoll is null)
