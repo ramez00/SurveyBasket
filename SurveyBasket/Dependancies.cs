@@ -41,6 +41,7 @@ public static class Dependencies
                 .AddAuthConfig(configuration)
                 .AddScoped<IPollServices, PollServices>()
                 .AddScoped<IAuthService, AuthService>()
+                .AddScoped<IQuestionService, QuestionService>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();

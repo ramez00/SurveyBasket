@@ -10,5 +10,8 @@ public class MappingConfigrations : IRegister
     {
         config.NewConfig<Poll, PollsResponse>()
                   .Map(dest => dest.Summary, src => src.Summary);
+
+        config.NewConfig<QuestionRequest,Question>()
+            .Map(dest => dest.Answers, src => src.Answers.Select(ans => new Answer { Content = ans }));
     }
 }

@@ -13,9 +13,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public DbSet<Poll> Polls { get; set; }
+    public DbSet<Answer> Answers { get; set; }
+    public DbSet<Question> Questions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        // to change all Delete Behavior From Cascade to Restricted To avoid Delete any record from database 
+
+        var cascadFk = modelBuilder.Model
+                .GetEntityTypes()
+                .SelectMany(t => t.GetForeignKeys())
+                .Where(x => x.DeleteBehavior == DeleteBehavior.Cascade && !x.IsOwnership);
+
+        foreach (var fk in cascadFk)
+            fk.DeleteBehavior = DeleteBehavior.Restrict;
+
         //modelBuilder.ApplyConfiguration(new ModelConfigrations());
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
