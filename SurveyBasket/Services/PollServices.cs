@@ -18,6 +18,16 @@ public class PollServices(ApplicationDbContext context) : IPollServices
         return polls.Adapt<IEnumerable<PollsResponse>>();
     }
 
+    public async Task<IEnumerable<PollsResponse>> GetCurretnAsync(CancellationToken token = default)
+    {
+        return await _context.Polls
+            .Where(x => x.IsPublished && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) 
+                                      && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow))
+            .AsNoTracking()
+            .ProjectToType<PollsResponse>()
+            .ToListAsync(token);
+    }
+
     public async Task<Result<PollsResponse>> GetByIdAsync(int Id,CancellationToken token = default) 
     {
         var poll = await _context.Polls.FindAsync(Id, token);
