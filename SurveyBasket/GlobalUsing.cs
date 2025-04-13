@@ -17,3 +17,5 @@ global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Mvc;
 global using SurveyBasket.Contracts.Answers;
+global using SurveyBasket.Extenstions;
+global using SurveyBasket.Contracts.Votes;

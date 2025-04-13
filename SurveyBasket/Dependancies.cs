@@ -42,6 +42,7 @@ public static class Dependencies
                 .AddScoped<IPollServices, PollServices>()
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IQuestionService, QuestionService>()
+                .AddScoped<IVoteServices, VoteServices>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();

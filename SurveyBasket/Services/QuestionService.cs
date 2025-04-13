@@ -31,6 +31,39 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
         return Result.Success<IEnumerable<QuestionResponse>>(questions);
     }
 
+    public async Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int PollId, string userId, CancellationToken cancellationToken)
+    {
+        var hasVote = await _dbContext.Votes.AnyAsync(x => x.PollID == PollId && x.UserId == userId, cancellationToken);
+
+        if (hasVote)
+            return Result.Failure<IEnumerable<QuestionResponse>>(VoteErrors.VoteDuplicated);
+
+        var pollExist = await _dbContext.Polls
+                .AnyAsync(x => x.Id == PollId &&
+                          x.IsPublished &&
+                          x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) &&
+                          x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken);
+
+        if (!pollExist)
+            return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
+
+        var questions = await _dbContext.Questions
+            .Where(x => x.PollId == PollId && x.IsActive)
+            .Include(x => x.Answers)
+            .Select(q => new QuestionResponse(
+                q.Id,
+                q.Content,
+                q.Answers.Where(a => a.IsActive).Select(a => new AnswerResponse(a.Id, a.Content))
+                ))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        if (questions.Count == 0)
+            return Result.Failure<IEnumerable<QuestionResponse>>(QuestionErrors.QuestionNotFoundWithPollId);
+            
+        return Result.Success<IEnumerable<QuestionResponse>>(questions);
+    }
+
     public async Task<Result<QuestionResponse>> GetByIdAsync(int PollId, int Id, CancellationToken cancellationToken = default)
     {
         var question = await _dbContext.Questions
@@ -40,7 +73,7 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
                     .AsNoTracking()
                     .SingleOrDefaultAsync(cancellationToken);
 
-        if(question is null)
+        if (question is null)
             return Result.Failure<QuestionResponse>(QuestionErrors.QuestionNotFound);
 
         return Result.Success(question);
@@ -48,12 +81,12 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
 
     public async Task<Result<QuestionResponse>> AddAsync(int PollId, QuestionRequest request, CancellationToken cancellationToken = default)
     {
-        var IsPollExist = await _dbContext.Polls.AnyAsync(x => x.Id == PollId,cancellationToken);
+        var IsPollExist = await _dbContext.Polls.AnyAsync(x => x.Id == PollId, cancellationToken);
 
         if (!IsPollExist)
             return Result.Failure<QuestionResponse>(PollErrors.PollNotFound);
 
-        var IsQuestionExist = await _dbContext.Questions.AnyAsync(x => x.Content == request.Content,cancellationToken);
+        var IsQuestionExist = await _dbContext.Questions.AnyAsync(x => x.Content == request.Content, cancellationToken);
 
         if (IsQuestionExist)
             return Result.Failure<QuestionResponse>(QuestionErrors.QuestionDuplicated);
@@ -61,40 +94,40 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
         var question = request.Adapt<Question>();
         question.PollId = PollId;
 
-        await _dbContext.AddAsync(question,cancellationToken);
+        await _dbContext.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success(question.Adapt<QuestionResponse>());
     }
 
-    public async Task<Result> UpdateAsync(int PollId,int Id, QuestionRequest request, CancellationToken cancellationToken)
+    public async Task<Result> UpdateAsync(int PollId, int Id, QuestionRequest request, CancellationToken cancellationToken)
     {
 
         var questionIsExist = await _dbContext.Questions
-            .AnyAsync(x => x.PollId == PollId &&  x.Id != Id && x.Content == request.Content , cancellationToken);
+            .AnyAsync(x => x.PollId == PollId && x.Id != Id && x.Content == request.Content, cancellationToken);
 
-        if(questionIsExist)
+        if (questionIsExist)
             return Result.Failure(QuestionErrors.QuestionDuplicated);
 
         var question = await _dbContext.Questions
             .Include(x => x.Answers)
-            .SingleOrDefaultAsync(x => x.PollId == PollId && x.Id == Id,cancellationToken);
+            .SingleOrDefaultAsync(x => x.PollId == PollId && x.Id == Id, cancellationToken);
 
         if (question is null)
             return Result.Failure(QuestionErrors.QuestionNotFound);
-        
+
         question.Content = request.Content;
 
         var currentAnswer = question.Answers.Select(x => x.Content).ToList();
 
         var newAnswer = request.Answers.Except(currentAnswer).ToList();
 
-        newAnswer.ForEach(ans => 
+        newAnswer.ForEach(ans =>
         {
             question.Answers.Add(new Answer { Content = ans });
         });
 
-        question.Answers.ToList().ForEach(ans => 
+        question.Answers.ToList().ForEach(ans =>
         {
             ans.IsActive = request.Answers.Contains(ans.Content);
         });
