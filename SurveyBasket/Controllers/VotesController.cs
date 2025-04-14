@@ -33,4 +33,22 @@ public class VotesController(IQuestionService questionService,IVoteServices vote
 
         return result.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpGet("GetVotedPoll")]
+    public async Task<IActionResult> GetVotedPoll(int pollId, CancellationToken cancellation)
+    {
+      var resp = await _voteService.GetPollVotesAsync(pollId, cancellation);
+      
+      return resp.IsSuccess ? Ok(resp) : resp.ToProblem(StatusCodes.Status500InternalServerError);
+
+    }
+
+    [HttpGet("GetVotesPerDay")]
+    public async Task<IActionResult> GetVotesPerDay(int pollId, CancellationToken cancellation)
+    {
+        var resp = await _voteService.GetVotesPerDayAsync(pollId, cancellation);
+
+        return resp.IsSuccess ? Ok(resp) : resp.ToProblem(StatusCodes.Status500InternalServerError);
+
+    }
 }

@@ -1,4 +1,5 @@
-﻿namespace SurveyBasket.Abstractions;
+﻿
+namespace SurveyBasket.Abstractions;
 
 public class Result
 {
@@ -19,6 +20,11 @@ public class Result
 
     public static Result<TValue> Success<TValue>(TValue value) => new(value,true,Error.None);
     public static Result<TValue> Failure<TValue>(Error error) => new(default,false,error);
+
+    internal static Result<T> Success<T>(Task<List<VotePerDayResponse>> votePerDay)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class Result<TValue>(TValue? value, bool isSuccess, Error error) : Result(isSuccess, error)

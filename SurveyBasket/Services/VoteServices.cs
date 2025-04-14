@@ -1,4 +1,5 @@
 ﻿using SurveyBasket.Contracts.Votes;
+using System.Collections.Generic;
 
 namespace SurveyBasket.Services;
 
@@ -18,7 +19,7 @@ public class VoteServices(ApplicationDbContext context) : IVoteServices
             .AnyAsync(x => x.Id == pollId &&
                 x.IsPublished 
                 && x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) 
-                && x.EndsAt <= DateOnly.FromDateTime(DateTime.UtcNow),cancellationToken);
+                && x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow),cancellationToken);
 
         if (!pollIsExist)
             return Result.Failure(PollErrors.PollNotFound);
@@ -42,5 +43,39 @@ public class VoteServices(ApplicationDbContext context) : IVoteServices
         await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
+    }
+
+    public async Task<Result<PollVoteResponse>> GetPollVotesAsync(int pollId, CancellationToken cancellationToken = default)
+    {
+        var poll = await _context.Polls
+              .Where(p => p.Id == pollId)
+              .Select(p => new PollVoteResponse(
+                  p.Title,
+                  p.Votes.Select(v => new VoteResponse(
+                      $"{v.User.FirstName} {v.User.LastName}",
+                      v.SubmittedOn,
+                      v.VoteAnswers.Select(a => new QuestionAnswerResponse(
+                          a.Question.Content,
+                          a.Answer.Content
+                          ))
+                      ))
+              ))
+              .SingleOrDefaultAsync(cancellationToken);
+
+        return poll is null
+            ? Result.Failure<PollVoteResponse>(PollErrors.PollNotFound)
+            : Result.Success<PollVoteResponse>(poll);
+    }
+
+    public async Task<Result<IEnumerable<VotePerDayResponse>>> GetVotesPerDayAsync(int pollId, CancellationToken cancellationToken = default)
+    {
+        var votePerDay = await _context.Votes
+            .Where(v => v.PollID == pollId)
+            .GroupBy(v => new { votedDate = DateOnly.FromDateTime(v.SubmittedOn) })
+            .Select(g => new VotePerDayResponse(g.Key.votedDate, g.Count()))
+            .ToListAsync(cancellationToken);
+
+        return Result.Success<IEnumerable<VotePerDayResponse>>(votePerDay);
+
     }
 }

@@ -19,3 +19,5 @@ global using Microsoft.AspNetCore.Mvc;
 global using SurveyBasket.Contracts.Answers;
 global using SurveyBasket.Extenstions;
 global using SurveyBasket.Contracts.Votes;
+global using SurveyBasket.Contracts.Result;
+global using SurveyBasket.Contracts.Votes;
