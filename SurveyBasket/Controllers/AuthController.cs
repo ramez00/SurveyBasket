@@ -18,7 +18,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
 
         return authRes.IsSuccess
             ? Ok(authRes.Value)
-            : authRes.ToProblem(StatusCodes.Status400BadRequest);
+            : authRes.ToProblem(StatusCodes.Status401Unauthorized);
     }
 
     [HttpPost("RefreshToken")]
