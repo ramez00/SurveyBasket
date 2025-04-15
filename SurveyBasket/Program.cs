@@ -11,6 +11,8 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
 );
 
+builder.Services.AddResponseCaching();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -26,6 +28,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.UseCors("Name of Core I defined")
 
 app.UseAuthorization();
+
+app.UseResponseCaching();
 
 app.MapIdentityApi<ApplicationUser>();
 
