@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNetCore.OutputCaching;
+using System.Linq;
 
 namespace SurveyBasket.Services;
 
-public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
+public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore outputCache) : IQuestionService
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly IOutputCacheStore _outputCache = outputCache;
 
     public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int PollId, CancellationToken cancellationToken = default)
     {
@@ -97,6 +99,8 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
         await _dbContext.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+
         return Result.Success(question.Adapt<QuestionResponse>());
     }
 
@@ -133,6 +137,8 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
         });
         await _dbContext.SaveChangesAsync();
 
+        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+
         return Result.Success();
     }
 
@@ -147,6 +153,9 @@ public class QuestionService(ApplicationDbContext dbContext) : IQuestionService
 
         question.IsActive = !question.IsActive;
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+
 
         return Result.Success();
     }

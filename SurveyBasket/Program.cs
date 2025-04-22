@@ -11,7 +11,14 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
 );
 
-builder.Services.AddOutputCache(); // Different between response cache and output cache => output cache is used to cache on server , while response cache is used to cache the response of a requester's memory.
+// Different between response cache and output cache => output cache is used to cache on server , while response cache is used to cache the response of a requester's memory.
+builder.Services.AddOutputCache(Options =>  
+{
+    Options.AddPolicy("Polls", x =>
+        x.Cache()
+         .Tag("AvliableQuestion")
+    );
+}); 
 
 var app = builder.Build();
 
