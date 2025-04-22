@@ -11,7 +11,7 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
 );
 
-builder.Services.AddResponseCaching();
+builder.Services.AddOutputCache(); // Different between response cache and output cache => output cache is used to cache on server , while response cache is used to cache the response of a requester's memory.
 
 var app = builder.Build();
 
@@ -29,7 +29,7 @@ app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.
 
 app.UseAuthorization();
 
-app.UseResponseCaching();
+app.UseOutputCache();
 
 app.MapIdentityApi<ApplicationUser>();
 
