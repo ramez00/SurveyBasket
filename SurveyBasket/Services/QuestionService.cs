@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.OutputCaching;
+﻿using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 
 namespace SurveyBasket.Services;
 
-public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore outputCache) : IQuestionService
+public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryCache) : IQuestionService
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly IOutputCacheStore _outputCache = outputCache;
+    private readonly IMemoryCache _memoryCache = memoryCache;
+
+    private const string _cachePrefix = "AvliableQuestion";
 
     public async Task<Result<IEnumerable<QuestionResponse>>> GetAllAsync(int PollId, CancellationToken cancellationToken = default)
     {
@@ -49,21 +51,31 @@ public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore ou
         if (!pollExist)
             return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
 
-        var questions = await _dbContext.Questions
-            .Where(x => x.PollId == PollId && x.IsActive)
-            .Include(x => x.Answers)
-            .Select(q => new QuestionResponse(
-                q.Id,
-                q.Content,
-                q.Answers.Where(a => a.IsActive).Select(a => new AnswerResponse(a.Id, a.Content))
-                ))
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
+        var cacheKey = $"{_cachePrefix}-{PollId}";
 
-        if (questions.Count == 0)
-            return Result.Failure<IEnumerable<QuestionResponse>>(QuestionErrors.QuestionNotFoundWithPollId);
+        var questions = await _memoryCache.GetOrCreateAsync(
+            cacheKey,
+            EntryPointNotFoundException =>
+            {
+                EntryPointNotFoundException.SlidingExpiration = TimeSpan.FromMinutes(2);
+                
+                return _dbContext.Questions
+                .Where(x => x.PollId == PollId && x.IsActive)
+                .Include(x => x.Answers)
+                .Select(q => new QuestionResponse(
+                    q.Id,
+                    q.Content,
+                    q.Answers.Where(a => a.IsActive).Select(a => new AnswerResponse(a.Id, a.Content))
+                    ))
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+            }
+        );
+
+        //if (questions!.Count == 0)
+        //    return Result.Failure<IEnumerable<QuestionResponse>>(QuestionErrors.QuestionNotFoundWithPollId);
             
-        return Result.Success<IEnumerable<QuestionResponse>>(questions);
+        return Result.Success<IEnumerable<QuestionResponse>>(questions!);
     }
 
     public async Task<Result<QuestionResponse>> GetByIdAsync(int PollId, int Id, CancellationToken cancellationToken = default)
@@ -99,7 +111,7 @@ public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore ou
         await _dbContext.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success(question.Adapt<QuestionResponse>());
     }
@@ -137,7 +149,7 @@ public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore ou
         });
         await _dbContext.SaveChangesAsync();
 
-        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success();
     }
@@ -154,7 +166,7 @@ public class QuestionService(ApplicationDbContext dbContext,IOutputCacheStore ou
         question.IsActive = !question.IsActive;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _outputCache.EvictByTagAsync("AvliableQuestion", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
 
 
         return Result.Success();
