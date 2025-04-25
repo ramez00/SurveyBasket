@@ -59,9 +59,9 @@ This project was a deep dive into modern backend development practices and repre
 - **ORM:** Entity Framework Core
 - **Validation:** FluentValidation
 - **Background Jobs:** Hangfire
-- **Caching:** Distributed Caching (e.g., Redis)
+- **Caching:** Distributed Caching
 - **Email:** SMTP/Email Sender Service
-- **Mapping:** Automapper or Mapster
+- **Mapping:** Mapster
 - **Versioning:** ASP.NET Core API Versioning
 - **Tools:** Visual Studio, Postman, Swagger (OpenAPI)
 
