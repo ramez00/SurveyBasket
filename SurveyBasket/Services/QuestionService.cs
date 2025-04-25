@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace SurveyBasket.Services;
 
-public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryCache) : IQuestionService
+public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheService) : IQuestionService
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly IMemoryCache _memoryCache = memoryCache;
+    private readonly ICacheService _cacheService = cacheService;
 
     private const string _cachePrefix = "AvliableQuestion";
 
@@ -53,13 +53,12 @@ public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryC
 
         var cacheKey = $"{_cachePrefix}-{PollId}";
 
-        var questions = await _memoryCache.GetOrCreateAsync(
-            cacheKey,
-            EntryPointNotFoundException =>
-            {
-                EntryPointNotFoundException.SlidingExpiration = TimeSpan.FromMinutes(2);
-                
-                return _dbContext.Questions
+        var chachedQuestions = await _cacheService.GetAsync<IEnumerable<QuestionResponse>>(cacheKey, cancellationToken);
+
+        if (chachedQuestions is not null)
+            return Result.Success(chachedQuestions);
+
+        var questions = await _dbContext.Questions
                 .Where(x => x.PollId == PollId && x.IsActive)
                 .Include(x => x.Answers)
                 .Select(q => new QuestionResponse(
@@ -69,12 +68,9 @@ public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryC
                     ))
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-            }
-        );
 
-        //if (questions!.Count == 0)
-        //    return Result.Failure<IEnumerable<QuestionResponse>>(QuestionErrors.QuestionNotFoundWithPollId);
-            
+        await _cacheService.SetAsync(cacheKey, questions, cancellationToken);
+
         return Result.Success<IEnumerable<QuestionResponse>>(questions!);
     }
 
@@ -111,7 +107,7 @@ public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryC
         await _dbContext.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
+        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success(question.Adapt<QuestionResponse>());
     }
@@ -149,7 +145,7 @@ public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryC
         });
         await _dbContext.SaveChangesAsync();
 
-        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
+        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success();
     }
@@ -166,8 +162,7 @@ public class QuestionService(ApplicationDbContext dbContext,IMemoryCache memoryC
         question.IsActive = !question.IsActive;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        _memoryCache.Remove($"{_cachePrefix}-{PollId}"); // to Refresh the cache delete old one Once Updated Questions
-
+        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success();
     }

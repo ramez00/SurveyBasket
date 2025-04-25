@@ -12,21 +12,16 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration)
 );
 
-// Different between response cache and output cache
+// Different between response cache and output cache and Distributed cache
 // => output cache is used to cache on server ,
 // while response cache is used to cache the response of a requester's memory.
-//builder.Services.AddOutputCache(Options =>  
-//{
-//    Options.AddPolicy("Polls", x =>
-//        x.Cache()
-//         .Tag("AvliableQuestion")
-//    );
-//});
-
 // In Memory cache => used to cache the data in memory of server 
-// if u have more than one server, the data will not be shared between them 
+// if u have more than one server, the data will not be shared between them
+// =====> distributed cache is used to cache the data in a shared location OR multiple servers.
 
-builder.Services.AddMemoryCache();
+builder.Services.AddDistributedMemoryCache(); // In Memory Cache
+
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 var app = builder.Build();
 
