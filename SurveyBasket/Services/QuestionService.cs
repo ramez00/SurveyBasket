@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 
 namespace SurveyBasket.Services;
 
-public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheService) : IQuestionService
+public class QuestionService(ApplicationDbContext dbContext,HybridCache hybridCache) : IQuestionService
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly ICacheService _cacheService = cacheService;
+    private readonly HybridCache _hybridCache = hybridCache;
 
     private const string _cachePrefix = "AvliableQuestion";
 
@@ -46,30 +47,31 @@ public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheS
                 .AnyAsync(x => x.Id == PollId &&
                           x.IsPublished &&
                           x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) &&
-                          x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken);
+                          x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken
+                );
 
         if (!pollExist)
             return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
 
         var cacheKey = $"{_cachePrefix}-{PollId}";
 
-        var chachedQuestions = await _cacheService.GetAsync<IEnumerable<QuestionResponse>>(cacheKey, cancellationToken);
-
-        if (chachedQuestions is not null)
-            return Result.Success(chachedQuestions);
-
-        var questions = await _dbContext.Questions
+        var questions = await _hybridCache.GetOrCreateAsync<IEnumerable<QuestionResponse>>(
+            cacheKey,
+            async entry => await _dbContext.Questions
                 .Where(x => x.PollId == PollId && x.IsActive)
                 .Include(x => x.Answers)
                 .Select(q => new QuestionResponse(
                     q.Id,
                     q.Content,
                     q.Answers.Where(a => a.IsActive).Select(a => new AnswerResponse(a.Id, a.Content))
-                    ))
+                ))
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
-
-        await _cacheService.SetAsync(cacheKey, questions, cancellationToken);
+                .ToListAsync(cancellationToken),
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5),
+            }
+        );
 
         return Result.Success<IEnumerable<QuestionResponse>>(questions!);
     }
@@ -107,7 +109,7 @@ public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheS
         await _dbContext.AddAsync(question, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        await _hybridCache.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success(question.Adapt<QuestionResponse>());
     }
@@ -145,7 +147,7 @@ public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheS
         });
         await _dbContext.SaveChangesAsync();
 
-        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        await _hybridCache.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success();
     }
@@ -162,7 +164,7 @@ public class QuestionService(ApplicationDbContext dbContext,ICacheService cacheS
         question.IsActive = !question.IsActive;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _cacheService.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
+        await _hybridCache.RemoveAsync($"{_cachePrefix}-{PollId}", cancellationToken); // to Refresh the cache delete old one Once Updated Questions
 
         return Result.Success();
     }

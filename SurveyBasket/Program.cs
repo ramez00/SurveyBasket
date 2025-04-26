@@ -19,9 +19,7 @@ builder.Host.UseSerilog((context, configuration) =>
 // if u have more than one server, the data will not be shared between them
 // =====> distributed cache is used to cache the data in a shared location OR multiple servers.
 
-builder.Services.AddDistributedMemoryCache(); // In Memory Cache
-
-builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddHybridCache(); // Distributed Cache
 
 var app = builder.Build();
 
