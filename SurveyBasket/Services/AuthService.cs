@@ -105,4 +105,38 @@ public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider j
 
         return (token, expireIn, RefreshToken, RefreshTokenExpiration);
     }
+
+    public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequestDTO request, CancellationToken cancellationToken = default)
+    {
+        var isEmailExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+
+        if(isEmailExist)
+            return Result.Failure<AuthResponse>(UserErrors.UserExist);
+
+        var user = new ApplicationUser
+        {
+            Email = request.Email,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            UserName = request.Email
+        };
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.First();
+            return Result.Failure<AuthResponse>(new Error(error.Code,error.Description));
+        }
+
+
+        var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
+
+        var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
+            , token, expireIn * ApplicationConstant.hour,
+            RefreshToken, RefreshTokenExpiration);
+
+        return Result.Success(resp);
+
+    }
 }

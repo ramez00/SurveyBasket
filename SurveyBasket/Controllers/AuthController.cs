@@ -41,4 +41,13 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
            : isRevoked.ToProblem(StatusCodes.Status400BadRequest);
     }
 
+    [HttpPost("Register-User")]
+    public async Task<IActionResult> RegisterUser([FromBody] RegisterRequestDTO request, CancellationToken cancellationToken)
+    {
+        var authRes = await _authService.RegisterAsync(request, cancellationToken);
+
+        return authRes.IsSuccess
+            ? Ok(authRes.Value)
+            : authRes.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }

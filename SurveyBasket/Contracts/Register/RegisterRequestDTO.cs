@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Contracts.Register;
 
-public record RegisterRequest(
+public record RegisterRequestDTO(
     string FirstName,
     string LastName,
     string Email,

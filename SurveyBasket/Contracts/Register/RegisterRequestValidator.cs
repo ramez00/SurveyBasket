@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Contracts.Register;
 
-public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
+public class RegisterRequestValidator : AbstractValidator<RegisterRequestDTO>
 {
     public RegisterRequestValidator()
     {

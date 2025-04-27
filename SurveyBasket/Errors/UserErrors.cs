@@ -10,4 +10,7 @@ public static class UserErrors
 
     public static readonly Error InvalidUser =
         new("User.NotFound", "User not found");
+
+    public static readonly Error UserExist =
+    new("User.Exist", "Email is already Exist");
 }
