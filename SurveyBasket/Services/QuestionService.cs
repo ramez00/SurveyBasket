@@ -38,20 +38,20 @@ public class QuestionService(ApplicationDbContext dbContext,HybridCache hybridCa
 
     public async Task<Result<IEnumerable<QuestionResponse>>> GetAvailableAsync(int PollId, string userId, CancellationToken cancellationToken)
     {
-        var hasVote = await _dbContext.Votes.AnyAsync(x => x.PollID == PollId && x.UserId == userId, cancellationToken);
+        //var hasVote = await _dbContext.Votes.AnyAsync(x => x.PollID == PollId && x.UserId == userId, cancellationToken);
 
-        if (hasVote)
-            return Result.Failure<IEnumerable<QuestionResponse>>(VoteErrors.VoteDuplicated);
+        //if (hasVote)
+        //    return Result.Failure<IEnumerable<QuestionResponse>>(VoteErrors.VoteDuplicated);
 
-        var pollExist = await _dbContext.Polls
-                .AnyAsync(x => x.Id == PollId &&
-                          x.IsPublished &&
-                          x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) &&
-                          x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken
-                );
+        //var pollExist = await _dbContext.Polls
+        //        .AnyAsync(x => x.Id == PollId &&
+        //                  x.IsPublished &&
+        //                  x.StartsAt <= DateOnly.FromDateTime(DateTime.UtcNow) &&
+        //                  x.EndsAt >= DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken
+        //        );
 
-        if (!pollExist)
-            return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
+        //if (!pollExist)
+        //    return Result.Failure<IEnumerable<QuestionResponse>>(PollErrors.PollNotFound);
 
         var cacheKey = $"{_cachePrefix}-{PollId}";
 

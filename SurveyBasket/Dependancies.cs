@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Authentication;
@@ -17,6 +18,7 @@ public static class Dependencies
     public static IServiceCollection AddAllDependencies(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddControllers();
+        services.AddHybridCache();
 
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
 
@@ -116,6 +118,12 @@ public static class Dependencies
            .BindConfiguration(JwtOptions.SectionName)
            .ValidateDataAnnotations()  // to validate all dataAnotaion
            .ValidateOnStart();         // to Validate once Start App
+
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequiredLength = 6;
+            options.User.RequireUniqueEmail = true;
+        });
 
         return services;
     }
