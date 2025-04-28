@@ -126,6 +126,7 @@ public static class Dependencies
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
             options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedEmail = true;
         });
 
         return services;

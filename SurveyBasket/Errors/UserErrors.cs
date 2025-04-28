@@ -12,5 +12,8 @@ public static class UserErrors
         new("User.NotFound", "User not found");
 
     public static readonly Error UserExist =
-    new("User.Exist", "Email is already Exist");
+        new("User.Exist", "Email is already Exist");
+
+    public static readonly Error EmailNotConfirmed =
+        new("User.EmailNotConfirmed", "Your Email is Not Confirmed");
 }

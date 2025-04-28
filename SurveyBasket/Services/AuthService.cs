@@ -25,8 +25,10 @@ public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider j
         if (!IsVaild)
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredrntials);
 
-        var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
+        if (!user.EmailConfirmed)
+            return Result.Failure<AuthResponse>(UserErrors.EmailNotConfirmed);
 
+        var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
 
         var resp = new AuthResponse(user.Id,user.Email,user.FirstName,user.LastName
             ,token,expireIn * ApplicationConstant.hour,
