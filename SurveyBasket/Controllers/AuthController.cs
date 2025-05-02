@@ -50,4 +50,14 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
             ? Ok(authRes.Value)
             : authRes.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpPost("Email-Confirm")]
+    public async Task<IActionResult> EmailConfirm([FromBody] ConfirmEmailRequest request)
+    {
+        var authRes = await _authService.ConfirmEmailAsync(request);
+
+        return authRes.IsSuccess
+            ? Ok()
+            : authRes.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }

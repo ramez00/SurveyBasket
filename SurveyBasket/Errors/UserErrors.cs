@@ -16,4 +16,7 @@ public static class UserErrors
 
     public static readonly Error EmailNotConfirmed =
         new("User.EmailNotConfirmed", "Your Email is Not Confirmed");
+
+    public static readonly Error EmailAlreadyConfirmed =
+               new("User.EmailAlreadyConfirmed", "Your Email is Already Confirmed");
 }

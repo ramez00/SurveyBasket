@@ -21,3 +21,4 @@ global using SurveyBasket.Extenstions;
 global using SurveyBasket.Contracts.Votes;
 global using SurveyBasket.Contracts.Result;
 global using SurveyBasket.Contracts.Register;
+global using SurveyBasket.Contracts.Auth.ConfirmEmail;

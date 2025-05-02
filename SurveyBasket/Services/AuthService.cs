@@ -141,4 +141,34 @@ public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider j
         return Result.Success(resp);
 
     }
+
+    public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserID);
+
+        if (user is null)
+            return Result.Failure(Errors.UserErrors.InvalidUser);
+
+        if (user.EmailConfirmed)
+            return Result.Failure(Errors.UserErrors.EmailAlreadyConfirmed);
+
+        var code = request.Code;
+
+        try
+        {
+            code = Encoding.UTF8.GetString(Convert.FromBase64String(code));
+        }
+        catch (Exception)
+        {
+
+            return Result.Failure(Errors.UserErrors.InvalidToken);
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, code);
+
+        if (!result.Succeeded)
+            return Result.Failure(Errors.UserErrors.InvalidToken);
+
+        return Result.Success();
+    }
 }
