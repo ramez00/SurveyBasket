@@ -7,8 +7,8 @@ using System.Text;
 namespace SurveyBasket.Services;
 
 public class AuthService(UserManager<ApplicationUser> userManager
-                        ,IJwtProvider jwtProvider
-                        ,ILogger<AuthService> logger) : IAuthService
+                        , IJwtProvider jwtProvider
+                        , ILogger<AuthService> logger) : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
@@ -33,9 +33,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
 
-        var resp = new AuthResponse(user.Id,user.Email,user.FirstName,user.LastName
-            ,token,expireIn * ApplicationConstant.hour,
-            RefreshToken,RefreshTokenExpiration);
+        var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
+            , token, expireIn * ApplicationConstant.hour,
+            RefreshToken, RefreshTokenExpiration);
 
         return Result.Success(resp);
     }
@@ -43,13 +43,13 @@ public class AuthService(UserManager<ApplicationUser> userManager
     public async Task<Result<AuthResponse>> GetRefreshTokenAsync(string token, string RefreshToken, CancellationToken cancellationToken = default)
     {
         var userId = _jwtProvider.ValidateToken(token);
-        
+
         if (userId is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
 
         var user = await _userManager.FindByIdAsync(userId);
 
-        if (user is null) 
+        if (user is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
 
         var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == RefreshToken && x.IsActive);
@@ -61,7 +61,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         var (newtoken, expireIn, RefreshTokenNew, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
 
-        var resp = new AuthResponse(user.Id, user.Email,user.FirstName,user.LastName
+        var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
             , newtoken, expireIn * ApplicationConstant.hour,
             RefreshTokenNew, RefreshTokenExpiration);
 
@@ -115,7 +115,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
     {
         var isEmailExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 
-        if(isEmailExist)
+        if (isEmailExist)
             return Result.Failure<AuthResponse>(UserErrors.UserExist);
 
         var user = new ApplicationUser
@@ -131,7 +131,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
         if (!result.Succeeded)
         {
             var error = result.Errors.First();
-            return Result.Failure<AuthResponse>(new Error(error.Code,error.Description));
+            return Result.Failure<AuthResponse>(new Error(error.Code, error.Description));
         }
 
 
@@ -182,6 +182,28 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         if (!result.Succeeded)
             return Result.Failure(Errors.UserErrors.InvalidToken);
+
+        return Result.Success();
+    }
+
+
+    public async Task<Result> ResendConfirmEmailAsync(ResendConfirmationEmail request)
+    {
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+
+        if (user is null)
+            return Result.Failure(UserErrors.EmailNotFound);
+
+        if (user.EmailConfirmed)
+            return Result.Failure(UserErrors.EmailCofirmed);
+
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));
+
+        var callbackUrl = $"/auth/confirm-email?userId={user.Id}&code={code}";
+
+        _logger.LogInformation("Email Confirmation Link: {callbackUrl}", callbackUrl);
 
         return Result.Success();
     }

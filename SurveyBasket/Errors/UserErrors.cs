@@ -19,4 +19,10 @@ public static class UserErrors
 
     public static readonly Error EmailAlreadyConfirmed =
                new("User.EmailAlreadyConfirmed", "Your Email is Already Confirmed");
+
+    public static readonly Error  EmailNotFound =
+           new("User.EmailSent", "Your Email is Already Sent");
+
+    public static readonly Error EmailCofirmed =
+       new("User.EmailCofirmed", "Your Email is Already Confirmed");
 }
