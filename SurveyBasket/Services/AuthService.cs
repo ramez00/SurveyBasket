@@ -6,10 +6,13 @@ using System.Text;
 
 namespace SurveyBasket.Services;
 
-public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider jwtProvider) : IAuthService
+public class AuthService(UserManager<ApplicationUser> userManager
+                        ,IJwtProvider jwtProvider
+                        ,ILogger<AuthService> logger) : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
+    private readonly ILogger<AuthService> _logger = logger;
     private readonly int _refreshTokenExpiryDays = ApplicationConstant.refreshTokenExpiryDays;
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string Email, string Password,
@@ -108,7 +111,7 @@ public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider j
         return (token, expireIn, RefreshToken, RefreshTokenExpiration);
     }
 
-    public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequestDTO request, CancellationToken cancellationToken = default)
+    public async Task<Result> RegisterAsync(RegisterRequestDTO request, CancellationToken cancellationToken = default)
     {
         var isEmailExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
 
@@ -132,13 +135,24 @@ public class AuthService(UserManager<ApplicationUser> userManager,IJwtProvider j
         }
 
 
-        var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));
 
-        var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
-            , token, expireIn * ApplicationConstant.hour,
-            RefreshToken, RefreshTokenExpiration);
+        var callbackUrl = $"/auth/confirm-email?userId={user.Id}&code={code}";
 
-        return Result.Success(resp);
+        _logger.LogInformation("Email Confirmation Link: {callbackUrl}", callbackUrl);
+
+        // TO DO: Send Email
+        // await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+
+
+        //var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
+
+        //var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
+        //    , token, expireIn * ApplicationConstant.hour,
+        //    RefreshToken, RefreshTokenExpiration);
+
+        return Result.Success();
 
     }
 

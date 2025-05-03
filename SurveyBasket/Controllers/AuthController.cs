@@ -47,7 +47,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
         var authRes = await _authService.RegisterAsync(request, cancellationToken);
 
         return authRes.IsSuccess
-            ? Ok(authRes.Value)
+            ? Ok(authRes)
             : authRes.ToProblem(StatusCodes.Status500InternalServerError);
     }
 
