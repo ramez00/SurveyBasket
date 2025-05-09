@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Authentication;
 using SurveyBasket.Errors;
 using SurveyBasket.Persistence;
+using SurveyBasket.Settings;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Text;
@@ -19,6 +20,8 @@ public static class Dependencies
     {
         services.AddControllers();
         services.AddHybridCache();
+
+        services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
 
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
 
