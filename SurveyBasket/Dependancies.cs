@@ -2,6 +2,7 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SurveyBasket.Authentication;
@@ -20,6 +21,7 @@ public static class Dependencies
     {
         services.AddControllers();
         services.AddHybridCache();
+        services.AddHttpContextAccessor();
 
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
 
@@ -48,6 +50,7 @@ public static class Dependencies
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IQuestionService, QuestionService>()
                 .AddScoped<IVoteServices, VoteServices>()
+                .AddScoped<IEmailSender,EmailService>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();

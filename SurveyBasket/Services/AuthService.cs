@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using SurveyBasket.Authentication;
 using SurveyBasket.Errors;
+using SurveyBasket.Helpers;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,12 +10,16 @@ namespace SurveyBasket.Services;
 
 public class AuthService(UserManager<ApplicationUser> userManager
                         , IJwtProvider jwtProvider
+                        , IEmailSender emailSender
+                        , IHttpContextAccessor httpContextAccessor
                         , ILogger<AuthService> logger) : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly ILogger<AuthService> _logger = logger;
     private readonly int _refreshTokenExpiryDays = ApplicationConstant.refreshTokenExpiryDays;
+    private readonly IEmailSender _emailSender = emailSender;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string Email, string Password,
         CancellationToken cancellationToken = default)
@@ -134,26 +140,16 @@ public class AuthService(UserManager<ApplicationUser> userManager
             return Result.Failure<AuthResponse>(new Error(error.Code, error.Description));
         }
 
-
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));
 
-        var callbackUrl = $"/auth/confirm-email?userId={user.Id}&code={code}";
+        var callbackUrl = $"auth/confirm-email?userId={user.Id}&code={code}";
 
         _logger.LogInformation("Email Confirmation Link: {callbackUrl}", callbackUrl);
 
-        // TO DO: Send Email
-        // await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-
-
-        //var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
-
-        //var resp = new AuthResponse(user.Id, user.Email, user.FirstName, user.LastName
-        //    , token, expireIn * ApplicationConstant.hour,
-        //    RefreshToken, RefreshTokenExpiration);
+        await SendConfirmationEmailAsync(user, callbackUrl);
 
         return Result.Success();
-
     }
 
     public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
@@ -205,6 +201,23 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         _logger.LogInformation("Email Confirmation Link: {callbackUrl}", callbackUrl);
 
+        await SendConfirmationEmailAsync(user, callbackUrl);
+
         return Result.Success();
+    }
+
+    private async Task SendConfirmationEmailAsync(ApplicationUser user,string confirmationLink)
+    {
+        var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
+
+        var body = EmailBodyBuilder.GenerateEmailBody("EmailConfirmation",
+            new Dictionary<string, string>
+            {
+                { "{name}" , $"{user.FirstName} {user.LastName}" },
+                { "{verficationCode}" , $"{origin}/{confirmationLink}" },
+            }
+        );
+
+        await _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Confirmation Email", body);
     }
 }

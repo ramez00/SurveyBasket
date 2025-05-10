@@ -35,7 +35,7 @@ app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.
 
 app.UseAuthorization();
 
-app.MapIdentityApi<ApplicationUser>();
+//app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers();
 
