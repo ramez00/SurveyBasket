@@ -1,4 +1,5 @@
 using Hangfire;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SurveyBasket;
@@ -36,7 +37,18 @@ app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.
 
 app.UseAuthorization();
 
-app.UseHangfireDashboard("/jobs");
+app.UseHangfireDashboard("/jobs", new DashboardOptions
+{
+    Authorization =
+    [
+       new HangfireCustomBasicAuthenticationFilter
+       {
+           User = app.Configuration.GetValue<string>("HangFireSettings:userName"),
+           Pass = app.Configuration.GetValue<string>("HangFireSettings:Password")
+       }
+    ],
+    DashboardTitle = "Survey Basket DashBoard Jobs" // to change title of screen 
+});
 
 app.MapControllers();
 
