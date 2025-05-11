@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿using Hangfire;
+using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -17,7 +18,7 @@ namespace SurveyBasket;
 
 public static class Dependencies
 {
-    public static IServiceCollection AddAllDependencies(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddAllDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
         services.AddHybridCache();
@@ -28,18 +29,23 @@ public static class Dependencies
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
 
         services.AddCors(options =>
-            options.AddPolicy("AllowMyDomain",builder => 
+            options.AddPolicy("AllowMyDomain", builder =>
                builder
                     .AllowAnyHeader()
                     .AllowAnyMethod()                        // Specific Method ("POST","PUT","GET")
                     .AllowAnyOrigin()                       // allow all cors 
-                   // .WithOrigins(allowedOrigins!)        // allow Specific Core 
+                                                            // .WithOrigins(allowedOrigins!)        // allow Specific Core 
             )
         );
 
         var connectionString = configuration.GetConnectionString("DefualtConnection") ??
                                throw new InvalidOperationException("Connection String....");
+
+        var hangFireConnection = configuration.GetConnectionString("HangFire") ??
+                                    throw new InvalidOperationException("HangFire Connection Not Exist...");
+
         services
+                .AddBackgroundJobsConfig(hangFireConnection)
                 .AddSewagerConfig()
                 .AddMapsterConfig()
                 .AddDataBaseConfig(connectionString)
@@ -50,10 +56,25 @@ public static class Dependencies
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IQuestionService, QuestionService>()
                 .AddScoped<IVoteServices, VoteServices>()
-                .AddScoped<IEmailSender,EmailService>()
+                .AddScoped<IEmailSender, EmailService>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();
+
+        return services;
+    }
+
+    private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, string hangFireConnection)
+    {
+        services
+            .AddHangfire(options => options
+
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSqlServerStorage(hangFireConnection)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+            )
+            .AddHangfireServer();
 
         return services;
     }
@@ -65,7 +86,7 @@ public static class Dependencies
         return services;
     }
 
-    private static IServiceCollection AddDataBaseConfig(this IServiceCollection services,string connectionString) 
+    private static IServiceCollection AddDataBaseConfig(this IServiceCollection services, string connectionString)
         => services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(connectionString));
 
     private static IServiceCollection AddMapsterConfig(this IServiceCollection services)
@@ -73,14 +94,14 @@ public static class Dependencies
         var MappingConfig = TypeAdapterConfig.GlobalSettings;
         MappingConfig.Scan(Assembly.GetExecutingAssembly());
 
-        services.AddSingleton<IMapper>(new Mapper (MappingConfig));
+        services.AddSingleton<IMapper>(new Mapper(MappingConfig));
 
         services.AddMapster();
-        
+
         return services;
     }
 
-    private static IServiceCollection AddFluentValidationConfig(this IServiceCollection service) 
+    private static IServiceCollection AddFluentValidationConfig(this IServiceCollection service)
         => service.AddFluentValidationAutoValidation()
                   .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
@@ -92,30 +113,30 @@ public static class Dependencies
         return services;
     }
 
-    private static IServiceCollection AddAuthConfig(this IServiceCollection services,IConfiguration configuration)
+    private static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
     {
 
         var jwtSettings = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>();
 
-            services.AddAuthentication(Options =>
+        services.AddAuthentication(Options =>
+        {
+            Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(o =>
+        {
+            o.SaveToken = true;
+            o.TokenValidationParameters = new TokenValidationParameters
             {
-                Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(o =>
-            {
-                o.SaveToken = true;
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
-                    ValidIssuer = jwtSettings?.Issuer,
-                    ValidAudience = jwtSettings?.Audience,
-                };
-            });
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
+                ValidIssuer = jwtSettings?.Issuer,
+                ValidAudience = jwtSettings?.Audience,
+            };
+        });
 
         // services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
 

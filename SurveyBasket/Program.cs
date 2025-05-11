@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SurveyBasket;
@@ -35,7 +36,7 @@ app.UseCors("AllowMyDomain"); // allow all origins && allow Specific Origin app.
 
 app.UseAuthorization();
 
-//app.MapIdentityApi<ApplicationUser>();
+app.UseHangfireDashboard("/jobs");
 
 app.MapControllers();
 
