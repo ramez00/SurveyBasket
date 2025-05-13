@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using SurveyBasket.Authentication;
 using SurveyBasket.Errors;
@@ -217,7 +218,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
                 { "{verficationCode}" , $"{origin}/{confirmationLink}" },
             }
         );
-
-        await _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Confirmation Email", body);
+        
+        BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Confirmation Email", body));
+        
+        await Task.CompletedTask;
     }
 }
