@@ -25,4 +25,9 @@ public static class UserErrors
 
     public static readonly Error EmailCofirmed =
        new("User.EmailCofirmed", "Your Email is Already Confirmed");
+
+    public static readonly Error PasswordEqualPrevious =
+         new("User.Password", "New Password can not equal current Password");
+
+    public static string FieldRequired(string name) => $"{name} this field Required";
 }

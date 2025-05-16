@@ -24,4 +24,13 @@ public class Account(IUserService userService) : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut]
+    [Route("Change-Password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var res = await _userService.ChangePasswordAsync(User.GetUserId()!,request);
+
+        return res.IsSuccess ? NoContent() : res.ToProblem(StatusCodes.Status400BadRequest);
+    }
 }
