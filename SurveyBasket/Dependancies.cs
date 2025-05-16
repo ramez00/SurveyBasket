@@ -57,6 +57,7 @@ public static class Dependencies
                 .AddScoped<IQuestionService, QuestionService>()
                 .AddScoped<IVoteServices, VoteServices>()
                 .AddScoped<IEmailSender, EmailService>()
+                .AddScoped<IUserService, UserService>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();
