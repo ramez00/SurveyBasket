@@ -8,8 +8,11 @@ public class UserService(UserManager<ApplicationUser> userManager) : IUserServic
 
     public async Task<Result<UserProfileResponse>> GetUserProfileAsync(string userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.Users
+                        .Where(x => x.Id == userId)
+                        .ProjectToType<UserProfileResponse>()  // Change to DbContext Instead User Managment  to Get Needed Data Only  
+                        .SingleAsync();
        
-        return Result.Success(user.Adapt<UserProfileResponse>());
+        return Result.Success(user);
     }
 }
