@@ -15,4 +15,13 @@ public class Account(IUserService userService) : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpPost]
+    [Route("UpdateUserProfile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UserProfileRequest request)
+    {
+        await _userService.UpdateProfileAsync(User.GetUserId()!,request);
+
+        return NoContent();
+    }
 }
