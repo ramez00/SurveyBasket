@@ -6,6 +6,7 @@ using SurveyBasket.Errors;
 using SurveyBasket.Helpers;
 using System.Security.Cryptography;
 using System.Text;
+using SurveyBasket.Contracts.Auth;
 
 namespace SurveyBasket.Services;
 
@@ -184,6 +185,26 @@ public class AuthService(UserManager<ApplicationUser> userManager
     }
 
 
+    public async Task<Result> SendResetPasswordCodeAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user is null)
+            return Result.Success();
+
+        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+        code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));
+
+        var callbackUrl = $"/auth/forget-password?userId={user.Id}&code={code}";
+
+        _logger.LogInformation("Email Reset Password Link: {callbackUrl}", callbackUrl);
+
+        await SendResetPasswordAsync(user, callbackUrl);
+
+        return Result.Success();
+    }
+
+
     public async Task<Result> ResendConfirmEmailAsync(ResendConfirmationEmail request)
     {
 
@@ -207,6 +228,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
         return Result.Success();
     }
 
+
     private async Task SendConfirmationEmailAsync(ApplicationUser user,string confirmationLink)
     {
         var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
@@ -221,6 +243,24 @@ public class AuthService(UserManager<ApplicationUser> userManager
         
         BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Confirmation Email", body));
         
+        await Task.CompletedTask;
+    }
+
+
+    private async Task SendResetPasswordAsync(ApplicationUser user, string confirmationLink)
+    {
+        var origin = _httpContextAccessor.HttpContext?.Request.Headers.Origin;
+
+        var body = EmailBodyBuilder.GenerateEmailBody("ForgetPassword",
+            new Dictionary<string, string>
+            {
+                { "{name}" , $"{user.FirstName} {user.LastName}" },
+                { "{Code}" , $"{origin}/{confirmationLink}" },
+            }
+        );
+
+        BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Change Password Email", body));
+
         await Task.CompletedTask;
     }
 }

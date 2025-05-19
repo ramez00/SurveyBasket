@@ -71,4 +71,14 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
             ? Ok()
             : Ok(authRes.Error);
     }
+
+    [HttpPost("Forget-Password")]
+    public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)
+    {
+        var authRes = await _authService.SendResetPasswordCodeAsync(request.Email);
+
+        return authRes.IsSuccess
+            ? Ok()
+            : Ok(authRes.Error);
+    }
 }
