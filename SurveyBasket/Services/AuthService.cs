@@ -7,6 +7,7 @@ using SurveyBasket.Helpers;
 using System.Security.Cryptography;
 using System.Text;
 using SurveyBasket.Contracts.Auth;
+using SurveyBasket.Abstractions;
 
 namespace SurveyBasket.Services;
 
@@ -262,5 +263,32 @@ public class AuthService(UserManager<ApplicationUser> userManager
         BackgroundJob.Enqueue(() => _emailSender.SendEmailAsync(user.Email!, "Survey Basket : Change Password Email", body));
 
         await Task.CompletedTask;
+    }
+
+    public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.email);
+
+        if(user is null || !user.EmailConfirmed)
+            return Result.Failure(Errors.UserErrors.InvalidToken);
+
+        IdentityResult result;
+
+        try
+        {
+            var code = Encoding.UTF8.GetString(Convert.FromBase64String(request.code));
+            result = await _userManager.ResetPasswordAsync(user, code, request.newPassword);
+        }
+        catch (Exception)
+        {
+            return Result.Failure(Errors.UserErrors.InvalidToken);
+        }
+
+        if(result.Succeeded)
+            return Result.Success();
+
+        var error = result.Errors.First();
+
+        return Result.Failure(new Error(error.Code, error.Description));
     }
 }

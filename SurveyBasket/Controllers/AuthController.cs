@@ -81,4 +81,14 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
             ? Ok()
             : Ok(authRes.Error);
     }
+
+    [HttpPost("Reset-Password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var authRes = await _authService.ResetPasswordAsync(request);
+        return authRes.IsSuccess
+            ? Ok()
+            : Ok(authRes.Error);
+    }
+
 }
