@@ -4,9 +4,10 @@ public class ConfirmEmailRequestValidator : AbstractValidator<ConfirmEmailReques
 {
     public ConfirmEmailRequestValidator()
     {
-        RuleFor(x => x.UserID)
+        RuleFor(x => x.Email)
             .NotEmpty()
-            .WithMessage("User ID is required.");
+            .WithMessage("User ID is required.")
+            .EmailAddress();
 
         RuleFor(x => x.Code)
             .NotEmpty();

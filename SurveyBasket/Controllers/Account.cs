@@ -9,14 +9,14 @@ public class Account(IUserService userService) : ControllerBase
 
     [HttpGet]
     [Route("GetUserProfile")]
-    public async Task<IActionResult> GetProfile(string userId)
+    public async Task<IActionResult> GetProfile()
     {
         var result = await _userService.GetUserProfileAsync(User.GetUserId()!);
 
         return Ok(result.Value);
     }
 
-    [HttpPost]
+    [HttpPut]
     [Route("UpdateUserProfile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UserProfileRequest request)
     {

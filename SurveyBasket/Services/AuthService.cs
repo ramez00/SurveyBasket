@@ -157,7 +157,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
     public async Task<Result> ConfirmEmailAsync(ConfirmEmailRequest request)
     {
-        var user = await _userManager.FindByIdAsync(request.UserID);
+        var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
             return Result.Failure(Errors.UserErrors.InvalidUser);
@@ -192,6 +192,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         if (user is null)
             return Result.Success();
+
+        if(!user.EmailConfirmed)
+            return Result.Failure(UserErrors.EmailNotConfirmed);
 
         var code = await _userManager.GeneratePasswordResetTokenAsync(user);
         code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));

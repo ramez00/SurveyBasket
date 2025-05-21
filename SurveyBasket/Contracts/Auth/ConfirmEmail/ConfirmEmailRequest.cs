@@ -1,6 +1,6 @@
 ﻿namespace SurveyBasket.Contracts.Auth.ConfirmEmail;
 
 public record ConfirmEmailRequest(
-   string UserID,
+   string Email,
    string Code
 );
