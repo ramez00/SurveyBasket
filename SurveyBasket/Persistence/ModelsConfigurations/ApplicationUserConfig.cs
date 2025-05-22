@@ -13,6 +13,21 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
 
         builder.Property(x => x.FirstName).HasMaxLength(200);
         builder.Property(x => x.LastName).HasMaxLength(200);
-    }
 
+        var passwordHasher = new PasswordHasher<ApplicationUser>();
+
+        // Default User
+        builder.HasData(new ApplicationUser
+        {
+            Id = DefaultUser.AdminId,
+            FirstName = "LES-Dev",
+            LastName = "Admin",
+            UserName = DefaultUser.AdminEmail,
+            NormalizedUserName = DefaultUser.AdminEmail.ToUpper(),
+            Email = DefaultUser.AdminEmail,
+            NormalizedEmail = DefaultUser.AdminEmail.ToUpper(),
+            EmailConfirmed = true,
+            PasswordHash = passwordHasher.HashPassword(null!, DefaultUser.AdminPassword)
+        });
+    }
 }

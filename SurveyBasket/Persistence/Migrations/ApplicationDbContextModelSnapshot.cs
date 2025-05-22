@@ -157,7 +157,7 @@ namespace SurveyBasket.Persistence.Migrations
                     b.HasIndex("QuestionId", "Content")
                         .IsUnique();
 
-                    b.ToTable("Answers");
+                    b.ToTable("Answers", (string)null);
                 });
 
             modelBuilder.Entity("SurveyBasket.Models.ApplicationRole", b =>
@@ -317,7 +317,7 @@ namespace SurveyBasket.Persistence.Migrations
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("Polls");
+                    b.ToTable("Polls", (string)null);
                 });
 
             modelBuilder.Entity("SurveyBasket.Models.Question", b =>
@@ -361,7 +361,7 @@ namespace SurveyBasket.Persistence.Migrations
                     b.HasIndex("PollId", "Content")
                         .IsUnique();
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("SurveyBasket.Models.Vote", b =>
@@ -389,7 +389,7 @@ namespace SurveyBasket.Persistence.Migrations
                     b.HasIndex("PollID", "UserId")
                         .IsUnique();
 
-                    b.ToTable("Votes");
+                    b.ToTable("Votes", (string)null);
                 });
 
             modelBuilder.Entity("SurveyBasket.Models.VoteAnswer", b =>
@@ -418,7 +418,7 @@ namespace SurveyBasket.Persistence.Migrations
                     b.HasIndex("QuestionId", "voteId")
                         .IsUnique();
 
-                    b.ToTable("voteAnswers");
+                    b.ToTable("voteAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
