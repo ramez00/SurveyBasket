@@ -90,5 +90,4 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
             ? Ok()
             : Ok(authRes.Error);
     }
-
 }
