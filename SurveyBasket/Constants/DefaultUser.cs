@@ -7,4 +7,6 @@ public static class DefaultUser
     public const string AdminSecurityStamp = "64B0CDC04F4744A1B1C938C7D9FCC01C";
     public const string AdminConcurrencyStamp = "EDFE0EAC-EB31-46FB-AEE8-C882172E1621";
     public const string AdminPassword = "Admin@123"; // TODO: Change this password to a more secure one
+    public const string FirstName = "LES-Dev";
+    public const string LastName = "Admin";
 }

@@ -20,8 +20,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.HasData(new ApplicationUser
         {
             Id = DefaultUser.AdminId,
-            FirstName = "LES-Dev",
-            LastName = "Admin",
+            FirstName = DefaultUser.FirstName,
+            LastName = DefaultUser.LastName,
             UserName = DefaultUser.AdminEmail,
             NormalizedUserName = DefaultUser.AdminEmail.ToUpper(),
             Email = DefaultUser.AdminEmail,
