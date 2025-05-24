@@ -20,6 +20,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.HasData(new ApplicationUser
         {
             Id = DefaultUser.AdminId,
+            ConcurrencyStamp = DefaultUser.AdminConcurrencyStamp,
+            SecurityStamp = DefaultUser.AdminSecurityStamp,
             FirstName = DefaultUser.FirstName,
             LastName = DefaultUser.LastName,
             UserName = DefaultUser.AdminEmail,
@@ -27,7 +29,7 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
             Email = DefaultUser.AdminEmail,
             NormalizedEmail = DefaultUser.AdminEmail.ToUpper(),
             EmailConfirmed = true,
-            PasswordHash = passwordHasher.HashPassword(null!, DefaultUser.AdminPassword)
+            PasswordHash = DefaultUser.AdminPasswordHash
         });
     }
 }

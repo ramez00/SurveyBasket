@@ -4,15 +4,11 @@ namespace SurveyBasket.Constants;
 
 public static class DefaultRole
 {
-    public const string Admin = nameof(Admin);
-    public const string AdminRoleId = "3A638288-4AE4-4E82-9106-701030C9B7A1";
-    public const string AdminRoleConcurrencyStamp = "EDFE0EAC-EB31-46FB-AEE8-C882172E1621";
-    //public const string AdminSecurityStamp = "64B0CDC04F4744A1B1C938C7D9FCC01C";
+    public const string Admin = "Admin";
+    public const string AdminRoleId = "905DF2BE-9722-402B-A141-2AE3F25A9842";
+    public const string AdminRoleConcurrencyStamp = "8B61025C-5CC6-4C69-963A-6C552DD586FB";
 
-
-    public const string Member = nameof(Member);
-    public const string MemberRoleId = "3A638288-4AE4-4E82-9106-701030C9B7A2";
-    public const string MemberRoleConcurrencyStamp = "EDFE0EAC-EB31-46FB-AEE8-C882172E1622";
-    //public const string MemberSecurityStamp = "64B0CDC04F4744A1B1C938C7D9FCC01D";
-
+    public const string Member = "Member";
+    public const string MemberRoleId = "A11D1435-FCBE-4773-BD26-521F8E054434";
+    public const string MemberRoleConcurrencyStamp = "F7815EED-96D0-46A2-AE5A-AB5E600C809E";
 }
