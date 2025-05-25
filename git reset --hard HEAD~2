@@ -1,0 +1,49 @@
+[33m98f671d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m test 2
+[33m00617b5[m - test
+[33m5192226[m - Add Seed Identity to App
+[33m4a8e686[m - Add Permissions to App - Connect User to Role
+[33m1839f6c[m - Add ApplicationRole to App
+[33m29a7e17[m - Add Default User to App
+[33m36a5e1b[m - Add ApplicationRol to App
+[33mb232ced[m - Add Extention method ExecuteUpdateAsync To Enhance Performance - Code Refactoring
+[33m81fa533[m - Add Reset Password EndPoint
+[33m2e3be4c[m - Add Forget Password EndPoint
+[33m5440178[m - Add Change Password EndPoint
+[33mb1f8ed3[m - Add Update User Profile EndPoint.
+[33mea76785[m - Using DbContext Instead User Manager to Get Needed Data Only.
+[33m3de98c1[m - Add Get User Profile Info EndPoint
+[33m2be885e[m - Use Enqueue Jobs (HangFire) for Sending Email
+[33md75cc76[m - Add Protection to HangFire DashBorad By creatring username and Password
+[33mf407cc4[m - Add HangFire Configerations
+[33m79f607f[m - Send Verification Email - Add Email Sender - Add Email Body Builder
+[33m8faa1d5[m - Add Email Configurations
+[33mdfe4392[m - Add Resend confirmation code
+[33m8874a4f[m - Generate Confirmation Code
+[33mffec837[m - Add confirm Email EndPoint
+[33m417611f[m - Add Confirmed Email Option to login.
+[33m270d644[m - Add Register-User EndPoint
+[33m277fae4[m - Create Regester Request with Validator
+[33mfbb0503[m -Change Caching To Hybired
+[33me9bd297[m Update README.md
+[33mf84e846[m -Change Caching To Distributed cache
+[33ma35ee92[m Create README.md
+[33mb25efa4[m - Change Caching To Memory Cache
+[33m39fb242[m - To Refresh OutputCache When Updated table
+[33m4dd7ef6[m - Change caching to OUTPUTCACHE
+[33m51ffae7[m - Add Caching=>  Response Cache to App
+[33m8a13f89[m - Add Serilog to App
+[33m9dc2c5d[m - Get Votes per Day
+[33me24ecba[m - Add Vote Module to App.
+[33me50969e[m - Add Votes and VoteAnswer Models
+[33m0820f92[m - Add Question Service to App.
+[33mf37a107[m - Add Exception Handling
+[33mea79c05[m - Add Problem to Application
+[33m97d812b[m - Add Result Pattern to the Application
+[33mfc7cfa1[m - Add Result Pattern to the Application
+[33mb206e88[m - Add Auditable Class - Add Cross Origin and Read it From AppSettings
+[33md85dbeb[m - Add RefreshToken to App
+[33m54df77a[m - Read All OPtions from AppSettings
+[33m05ecbed[m - Add Authentication Service to Application
+[33m7852b32[m - Add Mapster to App
+[33m66ca6b7[m Add project files.
+[33m5b61e20[m Add .gitattributes and .gitignore.

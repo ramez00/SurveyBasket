@@ -1,0 +1,228 @@
+[33mcommit 98f671d49215ec8aaf331f5fb66755fda6f00a46[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 24 20:43:35 2025 +0300
+
+    test 2
+
+[33mcommit 00617b537cc628aee654e5ebeea36e39e095b564[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 24 20:35:44 2025 +0300
+
+    - test
+
+[33mcommit 51922263d791389674c380317b239778bf6d43ae[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 24 15:45:35 2025 +0300
+
+    - Add Seed Identity to App
+
+[33mcommit 4a8e686331e2745fa6cfe687bb990695d6489147[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 24 09:33:31 2025 +0300
+
+    - Add Permissions to App
+    - Connect User to Role
+
+[33mcommit 1839f6c243b5bf772ae8398a9320d9f7ab39cfd6[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 24 08:57:51 2025 +0300
+
+    - Add ApplicationRole to App
+
+[33mcommit 29a7e176b598d0a91347ce0ed686c4d027e0e0b5[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Thu May 22 12:28:05 2025 +0300
+
+    - Add Default User to App
+
+[33mcommit 36a5e1ba5320bfb91cf8aba2224294a3836a11fc[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Thu May 22 10:32:55 2025 +0300
+
+    - Add ApplicationRol to App
+
+[33mcommit b232cedea9f706af9225dace0168a65739ceb49d[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Wed May 21 09:10:19 2025 +0300
+
+    - Add Extention method ExecuteUpdateAsync To Enhance Performance
+    - Code Refactoring
+
+[33mcommit 81fa53308a29522b57ac6e70b6732db0e95ca22c[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon May 19 09:32:31 2025 +0300
+
+    - Add Reset Password EndPoint
+
+[33mcommit 2e3be4c26b160948ebc5d0567e10fbce937f0bce[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon May 19 09:05:45 2025 +0300
+
+    - Add Forget Password EndPoint
+
+[33mcommit 5440178e8492a3b46aa15131dfed8a09d2cb6445[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 16 20:51:05 2025 +0300
+
+    - Add Change Password EndPoint
+
+[33mcommit b1f8ed3872a73f145fb35fea8de78615fce4a8f3[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 16 18:27:00 2025 +0300
+
+    - Add Update User Profile EndPoint.
+
+[33mcommit ea76785a2014b4cd5760de909539fc3c879d4c6b[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 16 17:46:33 2025 +0300
+
+    - Using DbContext Instead User Manager to Get Needed Data Only.
+
+[33mcommit 3de98c1d78883800a749e5ecf2f849274e39aa22[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 16 17:37:12 2025 +0300
+
+    - Add Get User Profile Info EndPoint
+
+[33mcommit 2be885ed446773c46e9129f0b16adf9a5b58e69b[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Tue May 13 14:23:43 2025 +0300
+
+    - Use Enqueue Jobs (HangFire) for Sending Email
+
+[33mcommit d75cc76d56e7f975b7f61b7f2cc0ccd0821a2625[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon May 12 00:45:41 2025 +0300
+
+    - Add Protection to HangFire DashBorad
+    By creatring username and Password
+
+[33mcommit f407cc48e3449482e04e1aac7fc1bcecc0046b6a[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon May 12 00:27:59 2025 +0300
+
+    - Add HangFire Configerations
+
+[33mcommit 79f607f902b7addd6dc9acc0ee0a8413d4e8574d[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 10 09:15:15 2025 +0300
+
+    - Send Verification Email
+    - Add Email Sender
+    - Add Email Body Builder
+
+[33mcommit 8faa1d5095a96b518692e7a2ce536f9760233274[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 9 12:47:33 2025 +0300
+
+    - Add Email Configurations
+
+[33mcommit dfe43922ceeb997f1d3fec305795ab6d814cb51d[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 3 12:15:07 2025 +0300
+
+    - Add Resend confirmation code
+
+[33mcommit 8874a4f661eb06ff4816b2a90e474ba88c18b119[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat May 3 10:15:41 2025 +0300
+
+    - Generate Confirmation Code
+
+[33mcommit ffec837823cc3fcbd29299268fea5fc75d69caf3[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri May 2 16:34:15 2025 +0300
+
+    - Add confirm Email EndPoint
+
+[33mcommit 417611f305bd468d80036f5ba99f027144f4af3c[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon Apr 28 16:11:28 2025 +0300
+
+    - Add Confirmed Email Option to login.
+
+[33mcommit 270d64403693b63ade2bf0d30d49e55a4a370f2a[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sun Apr 27 18:34:26 2025 +0300
+
+    - Add Register-User EndPoint
+
+[33mcommit 277fae4ec2eda1123669ab0c8199d9a1bafa3ceb[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sun Apr 27 14:37:38 2025 +0300
+
+    - Create Regester Request with Validator
+
+[33mcommit fbb0503e3c38b1fb69b536f823bb8b62a9bf8ac8[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sat Apr 26 14:36:29 2025 +0300
+
+    -Change Caching To Hybired
+
+[33mcommit e9bd297ee45cafca53dee165759c5cfce1db3237[m
+Author: ramez00 <77282371+ramez00@users.noreply.github.com>
+Date:   Fri Apr 25 22:45:17 2025 +0300
+
+    Update README.md
+    
+    update readme
+
+[33mcommit f84e8467e1392e88062c34ed430625587815aa2a[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Fri Apr 25 12:31:11 2025 +0300
+
+    -Change Caching To Distributed cache
+
+[33mcommit a35ee9223a8fd2d546a9525fd2a50ff6e4396aff[m
+Author: ramez00 <77282371+ramez00@users.noreply.github.com>
+Date:   Thu Apr 24 18:30:50 2025 +0200
+
+    Create README.md
+    
+    Add README file
+
+[33mcommit b25efa4357123e85a6098bee24981c4f96203619[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Wed Apr 23 09:26:26 2025 +0200
+
+    - Change Caching To Memory Cache
+
+[33mcommit 39fb24221eb9b6f497420d936dc54c614a76080c[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Tue Apr 22 11:07:45 2025 +0200
+
+    - To Refresh OutputCache When Updated table
+
+[33mcommit 4dd7ef6f94df9e599db332e29fccc8e597ad19e0[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Tue Apr 22 10:50:11 2025 +0200
+
+    - Change caching to OUTPUTCACHE
+
+[33mcommit 51ffae7a825bb08638a42e8950daf06442ab1ec3[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Tue Apr 15 12:05:16 2025 +0200
+
+    - Add Caching=>  Response Cache to App
+
+[33mcommit 8a13f89fa843c0d9d84b0fa2307b625978f0a9e8[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Tue Apr 15 11:30:10 2025 +0200
+
+    - Add Serilog to App
+
+[33mcommit 9dc2c5d58792c18fc7443e3d12de55e9b887d1eb[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Mon Apr 14 22:45:30 2025 +0200
+
+    - Get Votes per Day
+
+[33mcommit e24ecbae7c25512c6aeedd739559ba6eae549e76[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Sun Apr 13 14:09:41 2025 +0200
+
+    - Add Vote Module to App.
+
+[33mcommit e50969e4eaf87f85db17c3b90e643cdf6509fc7a[m
+Author: ramez.abdelhamid@health-insights.com <ramez.abdelhamid@health-insights.com>
+Date:   Wed Apr 9 05:20:53 2025 +0200

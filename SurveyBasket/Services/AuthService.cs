@@ -143,6 +143,8 @@ public class AuthService(UserManager<ApplicationUser> userManager
             return Result.Failure<AuthResponse>(new Error(error.Code, error.Description));
         }
 
+        await _userManager.AddToRoleAsync(user,DefaultRole.Member);
+
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         code = Convert.ToBase64String(Encoding.UTF8.GetBytes(code));
 
