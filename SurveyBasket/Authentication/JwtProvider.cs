@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace SurveyBasket.Authentication;
 
@@ -9,7 +10,8 @@ public class JwtProvider(IOptions<JwtOptions> jwtOption) : IJwtProvider
 {
     private readonly JwtOptions _jwtOptions = jwtOption.Value;
 
-    public (string token, int expiredIn) CreateToken(ApplicationUser user)
+    public (string token, int expiredIn) CreateToken(ApplicationUser user, 
+        IEnumerable<string> userRoles, IEnumerable<string> userPermissions)
     {
         Claim[] claims = new Claim[] {
             new Claim(JwtRegisteredClaimNames.Sub , user.Id),
@@ -17,6 +19,10 @@ public class JwtProvider(IOptions<JwtOptions> jwtOption) : IJwtProvider
             new Claim(JwtRegisteredClaimNames.GivenName , user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName , user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti , Guid.NewGuid().ToString()),
+            new Claim(nameof(userRoles),JsonSerializer.Serialize(userRoles),JsonClaimValueTypes.JsonArray),  // to send claims as Json Array
+            new Claim(nameof(userPermissions),JsonSerializer.Serialize(userPermissions),JsonClaimValueTypes.JsonArray)
+            //new Claim(nameof(userRoles), string.Join(',', userRoles)),
+            //new Claim(nameof(userPermissions), string.Join(',', userPermissions))
         };
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));

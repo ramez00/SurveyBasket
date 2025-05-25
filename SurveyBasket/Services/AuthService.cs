@@ -15,14 +15,17 @@ public class AuthService(UserManager<ApplicationUser> userManager
                         , IJwtProvider jwtProvider
                         , IEmailSender emailSender
                         , IHttpContextAccessor httpContextAccessor
+                        , ApplicationDbContext context
                         , ILogger<AuthService> logger) : IAuthService
 {
+   
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
     private readonly ILogger<AuthService> _logger = logger;
     private readonly int _refreshTokenExpiryDays = ApplicationConstant.refreshTokenExpiryDays;
     private readonly IEmailSender _emailSender = emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly ApplicationDbContext _context = context;   
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string Email, string Password,
         CancellationToken cancellationToken = default)
@@ -104,7 +107,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
     private async Task<(string token, int expire, string RefreshToken, DateTime RefreshTokenExpiration)>
         CreateTokenWithRefreshToken(ApplicationUser user)
     {
-        var (token, expireIn) = _jwtProvider.CreateToken(user);
+        var (userRoles, userPermissions) = await GetUserRoleAndPermission(user);
+
+        var (token, expireIn) = _jwtProvider.CreateToken(user,userRoles,userPermissions);
 
         var RefreshToken = GetRefreshToken();
         var RefreshTokenExpiration = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
@@ -295,5 +300,20 @@ public class AuthService(UserManager<ApplicationUser> userManager
         var error = result.Errors.First();
 
         return Result.Failure(new Error(error.Code, error.Description));
+    }
+
+    private async Task<(IEnumerable<string> userRole ,IEnumerable<string> userPermission)>
+        GetUserRoleAndPermission(ApplicationUser user)
+    {
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var userPermission = await (from role in _context.Roles
+                                    join permission in _context.RoleClaims on role.Id equals permission.RoleId
+                                    where userRoles.Contains(role.Name!)
+                                    select permission.ClaimValue)
+                                    .Distinct()
+                                    .ToListAsync();
+
+        return (userRoles, userPermission);
     }
 }
