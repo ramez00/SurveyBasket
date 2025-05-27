@@ -19,12 +19,9 @@ public class RoleService(RoleManager<ApplicationRole> roleManager) : IRoleServic
         if (role is null)
             return Result.Failure<RoleDetailsResponse>(RoleErrors.RoleNotFound);
 
-        var permission = await _roleManager.GetClaimsAsync(role);
+        var permissions = await _roleManager.GetClaimsAsync(role);
 
-        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted)
-        {
-            permissions = permission.Select(p => p.Value).ToList()
-        };
+        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted, permissions.Select(p => p.Value));
 
         return Result.Success(response);
     }
