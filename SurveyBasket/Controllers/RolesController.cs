@@ -15,4 +15,15 @@ public class RolesController(IRoleService roleService) : ControllerBase
         var roles = await _roleService.GetRolesAsync(IsActive, cancellationToken);
         return Ok(roles);   
     }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string id)
+    {
+        var result = await _roleService.GetByIdAsync(id);
+        
+        if (result.IsFailure)
+            return NotFound(result.Error);
+
+        return Ok(result.Value);
+    }
 }
