@@ -24,3 +24,4 @@ global using SurveyBasket.Contracts.Register;
 global using SurveyBasket.Contracts.Auth.ConfirmEmail;
 global using SurveyBasket.Contracts.UserProfile;
 global using Microsoft.AspNetCore.Identity;
+global using SurveyBasket.Contracts.Roles;

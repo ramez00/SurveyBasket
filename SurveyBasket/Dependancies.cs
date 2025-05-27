@@ -53,6 +53,7 @@ public static class Dependencies
                 .AddIdentityConfig()
                 .AddSingleton<IJwtProvider, JwtProvider>()
                 .AddAuthConfig(configuration)
+                .AddTransient<IRoleService, RoleService>()
                 .AddScoped<IPollServices, PollServices>()
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<IQuestionService, QuestionService>()
@@ -62,6 +63,7 @@ public static class Dependencies
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
                 .AddProblemDetails();
+
 
         return services;
     }
