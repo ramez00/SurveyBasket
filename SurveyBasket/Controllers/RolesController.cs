@@ -26,4 +26,15 @@ public class RolesController(IRoleService roleService) : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpPost("")]
+    public async Task<IActionResult> AddAsync([FromBody] RoleRequest request)
+    {
+        var result = await _roleService.AddAsync(request);
+
+        if (result.IsFailure)
+            return NotFound(result.Error);
+
+        return Ok(result.Value);
+    }
 }
