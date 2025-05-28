@@ -48,4 +48,15 @@ public class RolesController(IRoleService roleService) : ControllerBase
 
         return Ok(result.Value);
     }
+
+    [HttpPut("Toggle-Status")]
+    public async Task<IActionResult> toggleStatus(string id)
+    {
+        var result = await _roleService.ChangeToggleStatus(id);
+
+        if (result.IsFailure)
+            return NotFound(result.Error);
+
+        return NoContent();
+    }
 }

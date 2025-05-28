@@ -11,7 +11,7 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
     public async Task<IEnumerable<RoleResponse>> GetRolesAsync(bool? isActive = false, CancellationToken cancellationToken = default)
 
         => await _roleManager.Roles
-             .Where(role => !role.IsDefault && (!role.IsDelted == isActive || (isActive == true)))
+             .Where(role => !role.IsDefault && (!role.IsDeleted == isActive || (isActive == true)))
              .ProjectToType<RoleResponse>()
              .ToListAsync(cancellationToken);
 
@@ -24,7 +24,7 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
 
         var permissions = await _roleManager.GetClaimsAsync(role);
 
-        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted, permissions.Select(p => p.Value));
+        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDeleted, permissions.Select(p => p.Value));
 
         return Result.Success(response);
     }
@@ -58,7 +58,7 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
         await _context.RoleClaims.AddRangeAsync(claims);
         await _context.SaveChangesAsync();
 
-        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted, request.permissions);
+        var response = new RoleDetailsResponse(role.Id, role.Name!, role.IsDeleted, request.permissions);
 
         return Result.Success(response);
     }
@@ -105,13 +105,30 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
             await _context.RoleClaims.AddRangeAsync(newPermissions);
             await _context.SaveChangesAsync();
 
-            return Result.Success(new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted, request.permissions));
+            return Result.Success(new RoleDetailsResponse(role.Id, role.Name!, role.IsDeleted, request.permissions));
         }
 
         var error = result.Errors.First();
 
         return Result.Failure<RoleDetailsResponse>(new Error(error.Code.ToString(),error.Description));
 
+    }
+
+    public async Task<Result> ChangeToggleStatus(string id)
+    {
+        var role = await _roleManager.FindByIdAsync(id);
+
+        if (role is null)
+            return Result.Failure(RoleErrors.RoleNotFound);
+        
+        role.IsDeleted = !role.IsDeleted;
+
+        var result = await _roleManager.UpdateAsync(role);
+        
+        if (!result.Succeeded)
+            return Result.Failure(new Error(result.Errors.First().Code, result.Errors.First().Description));
+        
+        return Result.Success();
     }
 }
  

@@ -3,5 +3,5 @@
 public class ApplicationRole : IdentityRole
 {
     public bool IsDefault { get; set; }
-    public bool IsDelted { get; set; }
+    public bool IsDeleted { get; set; }
 }
