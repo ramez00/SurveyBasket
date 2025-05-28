@@ -62,5 +62,56 @@ public class RoleService(RoleManager<ApplicationRole> roleManager,ApplicationDbC
 
         return Result.Success(response);
     }
+
+    public async Task<Result<RoleDetailsResponse>> UpdateAsync(string id, RoleRequest request)
+    {
+        var roleExistsWithSameName = await _roleManager.RoleExistsAsync(request.Name);
+
+        if (roleExistsWithSameName)
+            return Result.Failure<RoleDetailsResponse>(RoleErrors.RoleExist);
+
+        if (await _roleManager.FindByIdAsync(id) is not { } role)
+            return Result.Failure<RoleDetailsResponse>(RoleErrors.RoleNotFound);
+
+        role.Name = request.Name;
+
+        var result = await _roleManager.UpdateAsync(role);
+
+        if (result.Succeeded)
+        {
+            // 1. new Permission to add 2.variance between current permission and user permission to delete
+
+            var currentPermission = await _context.RoleClaims
+                .Where(rc => rc.RoleId == role.Id && rc.ClaimType == "permission")
+                .Select(rc => rc.ClaimValue)
+                .ToListAsync();
+
+            var newPermissions =
+                currentPermission
+                .Except(currentPermission)  // extenstion methoud to get differance 
+                .Select(newPermissions => new IdentityRoleClaim<string>
+                {
+                    RoleId = role.Id,
+                    ClaimType = "permission",
+                    ClaimValue = newPermissions
+                });
+
+            var removedPermissions = currentPermission.Except(request.permissions);
+
+            await _context.RoleClaims
+                .Where(rc => rc.RoleId == id && rc.ClaimType == "permission" && removedPermissions.Contains(rc.ClaimValue))
+                .ExecuteDeleteAsync();
+
+            await _context.RoleClaims.AddRangeAsync(newPermissions);
+            await _context.SaveChangesAsync();
+
+            return Result.Success(new RoleDetailsResponse(role.Id, role.Name!, role.IsDelted, request.permissions));
+        }
+
+        var error = result.Errors.First();
+
+        return Result.Failure<RoleDetailsResponse>(new Error(error.Code.ToString(),error.Description));
+
+    }
 }
  

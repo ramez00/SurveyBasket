@@ -35,6 +35,17 @@ public class RolesController(IRoleService roleService) : ControllerBase
         if (result.IsFailure)
             return NotFound(result.Error);
 
+        return CreatedAtAction(nameof(GetAllAsync),result.Value);
+    }
+
+    [HttpPut("")]
+    public async Task<IActionResult> UpdateAsync(string id,[FromBody] RoleRequest request)
+    {
+        var result = await _roleService.UpdateAsync(id,request);
+
+        if (result.IsFailure)
+            return NotFound(result.Error);
+
         return Ok(result.Value);
     }
 }

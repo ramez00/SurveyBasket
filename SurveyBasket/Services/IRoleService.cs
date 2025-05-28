@@ -6,4 +6,5 @@ public interface IRoleService
 
     Task<Result<RoleDetailsResponse>> GetByIdAsync(string id);
     Task<Result<RoleDetailsResponse>> AddAsync(RoleRequest request);
+    Task<Result<RoleDetailsResponse>> UpdateAsync(string id, RoleRequest request);
 }
