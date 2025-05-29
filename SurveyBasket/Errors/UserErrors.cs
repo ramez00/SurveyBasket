@@ -2,6 +2,9 @@
 
 public static class UserErrors
 {
+    public static readonly Error UserIsDisabled =
+        new("User.Disabled", "User is Disabled Please check with Administrator");
+
     public static readonly Error InvalidCredrntials = 
         new("User.Invalid", "Invalid UserName/Password");
 

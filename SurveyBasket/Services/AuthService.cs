@@ -35,6 +35,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
         if (user is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidCredrntials);
 
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.UserIsDisabled);
+
         var IsVaild = await _userManager.CheckPasswordAsync(user, Password);
 
         if (!IsVaild)
@@ -63,6 +66,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         if (user is null)
             return Result.Failure<AuthResponse>(UserErrors.InvalidToken);
+
+        if (user.IsDisabled)
+            return Result.Failure<AuthResponse>(UserErrors.UserIsDisabled);
 
         var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == RefreshToken && x.IsActive);
 
