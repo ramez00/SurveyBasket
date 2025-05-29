@@ -14,6 +14,7 @@ namespace SurveyBasket.Services;
 public class AuthService(UserManager<ApplicationUser> userManager
                         , IJwtProvider jwtProvider
                         , IEmailSender emailSender
+                        , SignInManager<ApplicationUser> signInManager                          
                         , IHttpContextAccessor httpContextAccessor
                         , ApplicationDbContext context
                         , ILogger<AuthService> logger) : IAuthService
@@ -25,7 +26,8 @@ public class AuthService(UserManager<ApplicationUser> userManager
     private readonly int _refreshTokenExpiryDays = ApplicationConstant.refreshTokenExpiryDays;
     private readonly IEmailSender _emailSender = emailSender;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    private readonly ApplicationDbContext _context = context;   
+    private readonly ApplicationDbContext _context = context;
+    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
     public async Task<Result<AuthResponse>> GetTokenAsync(string Email, string Password,
         CancellationToken cancellationToken = default)
@@ -38,13 +40,16 @@ public class AuthService(UserManager<ApplicationUser> userManager
         if (user.IsDisabled)
             return Result.Failure<AuthResponse>(UserErrors.UserIsDisabled);
 
-        var IsVaild = await _userManager.CheckPasswordAsync(user, Password);
+        var IsVaild = await _signInManager.PasswordSignInAsync(user, Password,false,true);
 
-        if (!IsVaild)
-            return Result.Failure<AuthResponse>(UserErrors.InvalidCredrntials);
+        if (IsVaild.IsLockedOut)
+            return Result.Failure<AuthResponse>(UserErrors.UserLockedOut);
 
         if (!user.EmailConfirmed)
             return Result.Failure<AuthResponse>(UserErrors.EmailNotConfirmed);
+
+        if (IsVaild.IsNotAllowed)
+            return Result.Failure<AuthResponse>(UserErrors.InvalidCredrntials);
 
         var (token, expireIn, RefreshToken, RefreshTokenExpiration) = await CreateTokenWithRefreshToken(user);
 
@@ -69,6 +74,9 @@ public class AuthService(UserManager<ApplicationUser> userManager
 
         if (user.IsDisabled)
             return Result.Failure<AuthResponse>(UserErrors.UserIsDisabled);
+
+        if (user.LockoutEnd > DateTime.UtcNow)
+            return Result.Failure<AuthResponse>(UserErrors.UserLockedOut);
 
         var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == RefreshToken && x.IsActive);
 
