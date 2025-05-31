@@ -17,4 +17,13 @@ public class UsersController(IUserService userService) : ControllerBase
             ? Ok(users.Value)
             : users.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserDetailsAsync(string userId)
+    {
+        var user = await _userService.GetUserDetialsAsync(userId);
+        return user.IsSuccess
+            ? Ok(user.Value)
+            : user.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }
