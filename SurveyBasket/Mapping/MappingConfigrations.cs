@@ -13,5 +13,9 @@ public class MappingConfigrations : IRegister
 
         config.NewConfig<QuestionRequest,Question>()
             .Map(dest => dest.Answers, src => src.Answers.Select(ans => new Answer { Content = ans }));
+
+        config.NewConfig<(ApplicationUser user, IList<string> roles), UserResponse>()
+            .Map(dest => dest, src => src.user)
+            .Map(dest => dest.Roles, src => src.roles);
     }
 }

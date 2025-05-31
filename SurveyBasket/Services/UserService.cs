@@ -36,33 +36,17 @@ public class UserService(UserManager<ApplicationUser> userManager,ApplicationDbC
         return Result.Success<IEnumerable<UserResponse>>(users);
     }
 
-    public async Task<Result<IEnumerable<UserResponse>>> GetUserDetialsAsync(string userId)
+    public async Task<Result<UserResponse>> GetUserDetialsAsync(string userId)
     {
-        var users = await (from u in _context.Users
-                           join ur in _context.UserRoles on u.Id equals ur.UserId
-                           join r in _context.Roles on ur.RoleId equals r.Id into roles
-                           where u.Id == userId
-                           select new
-                           {
-                               u.Id,
-                               u.FirstName,
-                               u.LastName,
-                               u.Email,
-                               u.IsDisabled,
-                               Roles = roles.Select(x => x.Name!).ToList()
-                           })
-                                   .GroupBy(u => new { u.Id, u.FirstName, u.LastName, u.Email, u.IsDisabled, })
-                                   .Select(u => new UserResponse
-                                   (
-                                       u.Key.Id,
-                                       u.Key.FirstName,
-                                       u.Key.LastName,
-                                       u.Key.Email,
-                                       u.Key.IsDisabled,
-                                       u.SelectMany(x => x.Roles)
-                                   )).ToListAsync();
+        if( await _userManager.FindByIdAsync(userId) is not { } user)
+            return Result.Failure<UserResponse>(UserErrors.InvalidUser);
 
-        return Result.Success<IEnumerable<UserResponse>>(users);
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var response = (user, roles)
+            .Adapt<UserResponse>();
+
+        return Result.Success(response);
     }
 
     public async Task<Result<UserProfileResponse>> GetUserProfileAsync(string userId)
