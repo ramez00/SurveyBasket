@@ -36,4 +36,13 @@ public class UsersController(IUserService userService) : ControllerBase
             ? Ok(user.Value)
             : user.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpPut("{userId}")]
+    public async Task<IActionResult> UpdateUserAsync(string userId,UpdateUserRequest request, CancellationToken cancellationToken)
+    {
+        var user = await _userService.UpdateUserAsync(userId,request,cancellationToken);
+        return user.IsSuccess
+            ? NoContent()
+            : user.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }
