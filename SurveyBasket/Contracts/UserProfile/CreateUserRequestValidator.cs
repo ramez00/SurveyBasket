@@ -4,13 +4,13 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
 {
     public CreateUserRequestValidator()
     {
-        RuleFor(x => x.firstName)
+        RuleFor(x => x.FirstName)
                    .NotEmpty()
                    .WithMessage("First name is required.")
                    .Length(2, 90)
                    .WithMessage("First name must be between 2 and 50 characters.");
 
-        RuleFor(x => x.lastName)
+        RuleFor(x => x.LastName)
             .Length(3, 100)
             .NotEmpty();
 

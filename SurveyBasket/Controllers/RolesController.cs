@@ -10,7 +10,7 @@ public class RolesController(IRoleService roleService) : ControllerBase
     private readonly IRoleService _roleService = roleService;
 
     [HttpGet("")]
-    public async Task<IActionResult> GetAllAsync(bool? IsActive = false , CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllAsync(bool? IsActive = true , CancellationToken cancellationToken = default)
     {
         var roles = await _roleService.GetRolesAsync(IsActive, cancellationToken);
         return Ok(roles);   
