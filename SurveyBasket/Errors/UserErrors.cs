@@ -14,7 +14,7 @@ public static class UserErrors
     public static readonly Error InvalidToken =
         new("User.Token", "Invalid User Token");
 
-    public static readonly Error InvalidUser =
+    public static readonly Error UserNotFound =
         new("User.NotFound", "User not found");
 
     public static readonly Error UserExist =
@@ -34,6 +34,9 @@ public static class UserErrors
 
     public static readonly Error PasswordEqualPrevious =
          new("User.Password", "New Password can not equal current Password");
+
+    public static readonly Error InvalidRoles =
+        new("User.InvalidRoles", "Invalid Roles, there is no role like this");
 
     public static string FieldRequired(string name) => $"{name} this field Required";
 }

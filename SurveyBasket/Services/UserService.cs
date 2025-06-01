@@ -2,10 +2,13 @@
 
 namespace SurveyBasket.Services;
 
-public class UserService(UserManager<ApplicationUser> userManager,ApplicationDbContext context) : IUserService
+public class UserService(UserManager<ApplicationUser> userManager,
+    IRoleService roleService,
+    ApplicationDbContext context) : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
-    private readonly ApplicationDbContext _context = context;   
+    private readonly ApplicationDbContext _context = context;
+    private readonly IRoleService _roleService = roleService;
 
     public async Task<Result<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -22,7 +25,7 @@ public class UserService(UserManager<ApplicationUser> userManager,ApplicationDbC
                                u.IsDisabled,
                                Roles = roles.Select(x => x.Name!).ToList()
                            })
-                           .GroupBy(u => new { u.Id, u.FirstName, u.LastName, u.Email, u.IsDisabled, })
+                           .GroupBy(u => new { u.Id, u.FirstName, u.LastName, u.Email, u.IsDisabled })
                            .Select(u => new UserResponse
                            (
                                u.Key.Id,
@@ -39,7 +42,7 @@ public class UserService(UserManager<ApplicationUser> userManager,ApplicationDbC
     public async Task<Result<UserResponse>> GetUserDetialsAsync(string userId)
     {
         if( await _userManager.FindByIdAsync(userId) is not { } user)
-            return Result.Failure<UserResponse>(UserErrors.InvalidUser);
+            return Result.Failure<UserResponse>(UserErrors.UserNotFound);
 
         var roles = await _userManager.GetRolesAsync(user);
 
@@ -47,6 +50,42 @@ public class UserService(UserManager<ApplicationUser> userManager,ApplicationDbC
             .Adapt<UserResponse>();
 
         return Result.Success(response);
+    }
+
+    public async Task<Result<UserResponse>> AddUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
+    {
+        var IsUserExist = await _userManager.Users.AnyAsync(x => x.Email == request.Email, cancellationToken);
+
+        if (IsUserExist)
+            return Result.Failure<UserResponse>(UserErrors.UserExist);
+
+        var user = request.Adapt<ApplicationUser>();
+
+        var roles = await _roleService.GetRolesAsync(cancellationToken : cancellationToken);
+
+        if (request.roles.Except(roles.Select(x => x.Name!)).Any())
+            return Result.Failure<UserResponse>(UserErrors.InvalidRoles);
+
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.First();
+            return Result.Failure<UserResponse>(new Error(error.Code, error.Description));
+        }
+
+        var roleResult = await _userManager.AddToRolesAsync(user, request.roles);
+        if (!roleResult.Succeeded)
+        {
+            var error = roleResult.Errors.First();
+            return Result.Failure<UserResponse>(new Error(error.Code, error.Description));
+        }
+
+        // Return the created user response
+        var userResponse = (user, request.roles)
+            .Adapt<UserResponse>();
+
+        return Result.Success(userResponse);
     }
 
     public async Task<Result<UserProfileResponse>> GetUserProfileAsync(string userId)

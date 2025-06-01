@@ -26,4 +26,14 @@ public class UsersController(IUserService userService) : ControllerBase
             ? Ok(user.Value)
             : user.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpPost("")]
+    public async Task<IActionResult> AddAsync(CreateUserRequest request, CancellationToken cancellationToken)
+    {
+        var user = await _userService.AddUserAsync(request,cancellationToken);
+
+        return user.IsSuccess
+            ? Ok(user.Value)
+            : user.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }

@@ -2,6 +2,7 @@
 
 public interface IUserService
 {
+    Task<Result<UserResponse>> AddUserAsync(CreateUserRequest request,CancellationToken cancellationToken = default);
     Task<Result<UserResponse>> GetUserDetialsAsync(string userId);
     Task<Result<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Result<UserProfileResponse>> GetUserProfileAsync(string userId);

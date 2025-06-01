@@ -104,7 +104,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
         var user = await _userManager.FindByIdAsync(userId);
 
         if (user is null)
-            return Result.Failure(Errors.UserErrors.InvalidUser);
+            return Result.Failure(Errors.UserErrors.UserNotFound);
 
         var userRefreshToken = user.RefreshTokens.SingleOrDefault(x => x.Token == RefreshToken && x.IsActive);
 
@@ -181,7 +181,7 @@ public class AuthService(UserManager<ApplicationUser> userManager
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user is null)
-            return Result.Failure(Errors.UserErrors.InvalidUser);
+            return Result.Failure(Errors.UserErrors.UserNotFound);
 
         if (user.EmailConfirmed)
             return Result.Failure(Errors.UserErrors.EmailAlreadyConfirmed);
