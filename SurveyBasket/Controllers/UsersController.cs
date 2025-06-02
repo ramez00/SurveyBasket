@@ -49,17 +49,16 @@ public class UsersController(IUserService userService) : ControllerBase
     [HttpPut("toggle-status/{userId}")]
     public async Task<IActionResult> ToggleStatusUserAsync(string userId, CancellationToken cancellationToken)
     {
-        var user = await _userService.ToggleStatus(userId);
+        var user = await _userService.ToggleStatus(userId,cancellationToken);
         return user.IsSuccess
             ? NoContent()
             : user.ToProblem(StatusCodes.Status500InternalServerError);
     }
 
-
     [HttpPut("Unlock/{userId}")]
     public async Task<IActionResult> UnlockUserAsync(string userId, CancellationToken cancellationToken)
     {
-        var user = await _userService.UnlockUser(userId);
+        var user = await _userService.UnlockUser(userId,cancellationToken);
         return user.IsSuccess
             ? NoContent()
             : user.ToProblem(StatusCodes.Status500InternalServerError);
