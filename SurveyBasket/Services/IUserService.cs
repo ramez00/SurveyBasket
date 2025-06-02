@@ -10,4 +10,5 @@ public interface IUserService
     Task<Result> ChangePasswordAsync(string userId,ChangePasswordRequest request);
     Task<Result> UpdateUserAsync(string userId, UpdateUserRequest request, CancellationToken cancellationToken = default);
     Task<Result> ToggleStatus(string userId, CancellationToken cancellationToken = default);
+    Task<Result> UnlockUser(string userId, CancellationToken cancellationToken = default);
 }

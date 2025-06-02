@@ -190,4 +190,21 @@ public class UserService(UserManager<ApplicationUser> userManager,
         }
         return Result.Success();
     }
+
+    public async Task<Result> UnlockUser(string userId, CancellationToken cancellationToken = default)
+    {
+        if (await _userManager.FindByIdAsync(userId) is not { } user)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        user.LockoutEnabled = true;
+        user.LockoutEnd = null; // Unlock the user by setting LockoutEnd to null
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.First();
+            return Result.Failure(new Error(error.Code, error.Description));
+        }
+        return Result.Success();
+    }
 }

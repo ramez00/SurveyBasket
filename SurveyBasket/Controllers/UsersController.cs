@@ -54,4 +54,14 @@ public class UsersController(IUserService userService) : ControllerBase
             ? NoContent()
             : user.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+
+    [HttpPut("Unlock/{userId}")]
+    public async Task<IActionResult> UnlockUserAsync(string userId, CancellationToken cancellationToken)
+    {
+        var user = await _userService.UnlockUser(userId);
+        return user.IsSuccess
+            ? NoContent()
+            : user.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }
