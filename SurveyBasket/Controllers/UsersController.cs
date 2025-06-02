@@ -45,4 +45,13 @@ public class UsersController(IUserService userService) : ControllerBase
             ? NoContent()
             : user.ToProblem(StatusCodes.Status500InternalServerError);
     }
+
+    [HttpPut("toggle-status/{userId}")]
+    public async Task<IActionResult> ToggleStatusUserAsync(string userId, CancellationToken cancellationToken)
+    {
+        var user = await _userService.ToggleStatus(userId);
+        return user.IsSuccess
+            ? NoContent()
+            : user.ToProblem(StatusCodes.Status500InternalServerError);
+    }
 }

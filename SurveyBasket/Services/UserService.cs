@@ -41,7 +41,7 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
     public async Task<Result<UserResponse>> GetUserDetialsAsync(string userId)
     {
-        if( await _userManager.FindByIdAsync(userId) is not { } user)
+        if (await _userManager.FindByIdAsync(userId) is not { } user)
             return Result.Failure<UserResponse>(UserErrors.UserNotFound);
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -61,7 +61,7 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
         var user = request.Adapt<ApplicationUser>();
 
-        var roles = await _roleService.GetRolesAsync(cancellationToken : cancellationToken);
+        var roles = await _roleService.GetRolesAsync(cancellationToken: cancellationToken);
 
         if (request.roles.Except(roles.Select(x => x.Name!)).Any())
             return Result.Failure<UserResponse>(UserErrors.InvalidRoles);
@@ -134,7 +134,7 @@ public class UserService(UserManager<ApplicationUser> userManager,
                         .Where(x => x.Id == userId)
                         .ProjectToType<UserProfileResponse>()  // Change to DbContext Instead User Managment  to Get Needed Data Only  
                         .SingleAsync();
-       
+
         return Result.Success(user);
     }
 
@@ -167,11 +167,27 @@ public class UserService(UserManager<ApplicationUser> userManager,
 
         var Res = await _userManager.ChangePasswordAsync(user!, request.currentPassword, request.NewPassword);
 
-        if(Res.Succeeded)
+        if (Res.Succeeded)
             return Result.Success();
 
         var error = Res.Errors.First();
 
-        return Result.Failure( new Error(error.Code,error.Description));
+        return Result.Failure(new Error(error.Code, error.Description));
+    }
+
+    public async Task<Result> ToggleStatus(string userId, CancellationToken cancellationToken = default)
+    {
+        if (await _userManager.FindByIdAsync(userId) is not { } user)
+            return Result.Failure(UserErrors.UserNotFound);
+
+        user.IsDisabled = !user.IsDisabled;
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var error = result.Errors.First();
+            return Result.Failure(new Error(error.Code, error.Description));
+        }
+        return Result.Success();
     }
 }
