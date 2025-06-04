@@ -26,7 +26,7 @@ public class QuestionService(ApplicationDbContext dbContext,HybridCache hybridCa
             query = query.Where(x => x.Content.Contains(filter.SearchValue));
 
         if (!string.IsNullOrEmpty(filter.SortBy))
-            query = query.OrderBy($"{filter.SortBy} {filter.IsAscending}");
+            query = query.OrderBy($"{filter.SortBy} {filter.SortDirection}");
         
         var source = query
                         .Include(quest => quest.Answers)

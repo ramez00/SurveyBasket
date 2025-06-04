@@ -6,5 +6,5 @@ public record RequestFilters
     public int PageSize { get; init; } = 10;
     public string? SearchValue { get; init; }
     public string? SortBy { get; init; }
-    public bool IsAscending { get; init; } = true;
+    public string? SortDirection { get; init; } = "ASC";
 }
