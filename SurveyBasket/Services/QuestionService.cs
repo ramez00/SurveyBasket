@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
 using SurveyBasket.Contracts.Common;
-using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace SurveyBasket.Services;
 
@@ -20,17 +20,20 @@ public class QuestionService(ApplicationDbContext dbContext,HybridCache hybridCa
             return Result.Failure<PaginatedList<QuestionResponse>>(PollErrors.PollNotFound);
 
         var query = _dbContext.Questions
-            .Where(x => x.PollId == PollId && (string.IsNullOrEmpty(filter.SearchValue) || x.Content.Contains(filter.SearchValue)))
-            .Include(quest => quest.Answers)
-            .ProjectToType<QuestionResponse>()
-            //.Select(a => new QuestionResponse (
-            //    a.Id,
-            //    a.Content,
-            //    a.Answers.Select(ans => new AnswerResponse(ans.Id,ans.Content))
-            //    ))
-            .AsNoTracking();
+            .Where(x => x.PollId == PollId);
 
-        var questions = await PaginatedList<QuestionResponse>.CreateAsync(query, filter.PageNumber,filter.PageSize,cancellationToken);
+        if (!string.IsNullOrEmpty(filter.SearchValue))
+            query = query.Where(x => x.Content.Contains(filter.SearchValue));
+
+        if (!string.IsNullOrEmpty(filter.SortBy))
+            query = query.OrderBy($"{filter.SortBy} {filter.IsAscending}");
+        
+        var source = query
+                        .Include(quest => quest.Answers)
+                        .ProjectToType<QuestionResponse>()
+                        .AsNoTracking();
+
+        var questions = await PaginatedList<QuestionResponse>.CreateAsync(source, filter.PageNumber,filter.PageSize,cancellationToken);
 
         if (questions.Count == 0)
             return Result.Failure<PaginatedList<QuestionResponse>>(Errors.QuestionErrors.QuestionNotFoundWithPollId);
