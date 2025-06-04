@@ -24,6 +24,7 @@ public static class Dependencies
         services.AddControllers();
         services.AddHybridCache();
         services.AddHttpContextAccessor();
+        services.AddHealthChecks();
 
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
 

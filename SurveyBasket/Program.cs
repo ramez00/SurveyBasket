@@ -54,4 +54,6 @@ app.MapControllers();
 
 app.UseExceptionHandler();
 
+app.MapHealthChecks("/health");
+
 app.Run();
