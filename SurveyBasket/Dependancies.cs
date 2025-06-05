@@ -24,7 +24,6 @@ public static class Dependencies
         services.AddControllers();
         services.AddHybridCache();
         services.AddHttpContextAccessor();
-        services.AddHealthChecks();
 
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
 
@@ -40,11 +39,14 @@ public static class Dependencies
             )
         );
 
-        var connectionString = configuration.GetConnectionString("DefualtConnection") ??
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Connection String....");
 
         var hangFireConnection = configuration.GetConnectionString("HangFire") ??
                                     throw new InvalidOperationException("HangFire Connection Not Exist...");
+
+        services.AddHealthChecks().AddSqlServer("DataBase",connectionString);
+
 
         services
                 .AddBackgroundJobsConfig(hangFireConnection)

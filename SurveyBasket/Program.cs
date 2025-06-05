@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SurveyBasket;
 using SurveyBasket.Persistence;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Identity.Client;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +57,9 @@ app.MapControllers();
 
 app.UseExceptionHandler();
 
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health",new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse // to change the response of health check
+});
 
 app.Run();
