@@ -47,7 +47,8 @@ public static class Dependencies
 
         services.AddHealthChecks()
             .AddSqlServer("DataBase",connectionString!)
-            .AddHangfire(Options => { Options.MinimumAvailableServers = 1; });
+            .AddHangfire(Options => { Options.MinimumAvailableServers = 1; })
+            .AddUrlGroup( new Uri("https://www.google.com"),"External API"); // add Health Check for external API
 
 
         services
