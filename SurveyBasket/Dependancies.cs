@@ -39,20 +39,22 @@ public static class Dependencies
             )
         );
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                               throw new InvalidOperationException("Connection String....");
+        var connectionString = configuration.GetConnectionString("DefaultConnection") ?? 
+                                    throw new InvalidOperationException("SQL DataBase Conncetion String..");
 
         var hangFireConnection = configuration.GetConnectionString("HangFire") ??
                                     throw new InvalidOperationException("HangFire Connection Not Exist...");
 
-        services.AddHealthChecks().AddSqlServer("DataBase",connectionString);
+        services.AddHealthChecks()
+            .AddSqlServer("DataBase",connectionString!)
+            .AddHangfire(Options => { Options.MinimumAvailableServers = 1; });
 
 
         services
                 .AddBackgroundJobsConfig(hangFireConnection)
                 .AddSewagerConfig()
                 .AddMapsterConfig()
-                .AddDataBaseConfig(connectionString)
+                .AddDataBaseConfig(connectionString!)
                 .AddIdentityConfig()
                 .AddSingleton<IJwtProvider, JwtProvider>()
                 .AddAuthConfig(configuration)
