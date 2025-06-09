@@ -62,4 +62,10 @@ app.MapHealthChecks("/health",new HealthCheckOptions
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse // to change the response of health check
 });
 
+app.MapHealthChecks("/health-check-api", new HealthCheckOptions  // if i need to sperate health check 
+{
+    Predicate = x => x.Tags.Contains("API"), // to generate new URL to check only APIs service health check
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse // to change the response of health check
+});
+
 app.Run();
