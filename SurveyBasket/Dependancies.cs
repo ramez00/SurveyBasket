@@ -57,6 +57,8 @@ public static class Dependencies
 
         services.AddRateLimiter(option =>
         {
+            option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
+
             option.AddConcurrencyLimiter("concurrency", opt =>
             {
                 opt.QueueLimit = 10;  // recive 10 rqsts at same time 
