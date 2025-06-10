@@ -7,6 +7,7 @@ using SurveyBasket.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Identity.Client;
 using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,8 @@ app.UseHangfireDashboard("/jobs", new DashboardOptions
 app.MapControllers();
 
 app.UseExceptionHandler();
+
+app.UseRateLimiter();
 
 app.MapHealthChecks("/health",new HealthCheckOptions
 {

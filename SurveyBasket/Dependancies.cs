@@ -4,6 +4,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +16,7 @@ using SurveyBasket.Settings;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 
 namespace SurveyBasket;
 
@@ -53,6 +55,15 @@ public static class Dependencies
             .AddUrlGroup( new Uri("https://www.faceBook.com"),"MetaApi",tags: ["API"]) // if I have another external API 
             .AddCheck<MailServiceHealthCheck>("Mail Service", tags: ["mail"]); // add Health Check for Mail Service
 
+        services.AddRateLimiter(option =>
+        {
+            option.AddConcurrencyLimiter("concurrency", opt =>
+            {
+                opt.QueueLimit = 10;  // recive 10 rqsts at same time 
+                opt.QueueLimit = 5;   // max number per queue
+                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; 
+            });
+        });
 
         services
                 .AddBackgroundJobsConfig(hangFireConnection)
