@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using SurveyBasket.Authentication;
 
@@ -89,5 +90,13 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
         return authRes.IsSuccess
             ? Ok()
             : Ok(authRes.Error);
+    }
+
+    [HttpGet("test")]
+    [EnableRateLimiting("concurrency")]
+    public IActionResult Test()
+    {
+        Thread.Sleep(6000); 
+        return Ok("Test endpoint is working");
     }
 }
