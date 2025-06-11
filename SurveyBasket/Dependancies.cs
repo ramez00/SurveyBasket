@@ -59,14 +59,12 @@ public static class Dependencies
         {
             option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
 
-            option.AddTokenBucketLimiter("DefaultToken", options =>
+            option.AddFixedWindowLimiter("fixed-window", options => // to close connection once I finish my requests 
             {
-                options.TokenLimit = 10; // Maximum number of requests
-                options.QueueLimit = 5; // Maximum number of requests in the queue
-                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // Process oldest request first
-                options.ReplenishmentPeriod = TimeSpan.FromSeconds(10); // Replenish tokens every 10 seconds
-                options.TokensPerPeriod = 2; // Replenish 1 token per period
-                options.AutoReplenishment = true; // Automatically replenish tokens
+                options.Window = TimeSpan.FromSeconds(10); // 10 seconds
+                options.PermitLimit = 5; // allow 5 request in 10 seconds
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request first
+                options.QueueLimit = 2; // allow 2 request in queue
             });
         });
 

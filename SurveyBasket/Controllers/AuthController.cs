@@ -93,7 +93,7 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     }
 
     [HttpGet("test")]
-    [EnableRateLimiting("DefaultToken")]
+    [EnableRateLimiting("fixed-window")]
     public IActionResult Test()
     {
         Thread.Sleep(6000); 
