@@ -59,11 +59,14 @@ public static class Dependencies
         {
             option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
 
-            option.AddConcurrencyLimiter("concurrency", opt =>
+            option.AddTokenBucketLimiter("DefaultToken", options =>
             {
-                opt.QueueLimit = 10;  // recive 10 rqsts at same time 
-                opt.QueueLimit = 5;   // max number per queue
-                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; 
+                options.TokenLimit = 10; // Maximum number of requests
+                options.QueueLimit = 5; // Maximum number of requests in the queue
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // Process oldest request first
+                options.ReplenishmentPeriod = TimeSpan.FromSeconds(10); // Replenish tokens every 10 seconds
+                options.TokensPerPeriod = 2; // Replenish 1 token per period
+                options.AutoReplenishment = true; // Automatically replenish tokens
             });
         });
 
