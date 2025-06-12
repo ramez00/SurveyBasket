@@ -59,12 +59,13 @@ public static class Dependencies
         {
             option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
 
-            option.AddFixedWindowLimiter("fixed-window", options => // to close connection once I finish my requests 
+            option.AddSlidingWindowLimiter("SlidingLimiter", options =>
             {
-                options.Window = TimeSpan.FromSeconds(10); // 10 seconds
-                options.PermitLimit = 5; // allow 5 request in 10 seconds
+                options.PermitLimit = 10; // max request per user
+                options.Window = TimeSpan.FromMinutes(1); // time to reset the request
                 options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request first
-                options.QueueLimit = 2; // allow 2 request in queue
+                options.QueueLimit = 2; // max request in queue
+                options.SegmentsPerWindow = 2; // number of segments in the window
             });
         });
 
