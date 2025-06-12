@@ -82,6 +82,13 @@ public static class Dependencies
                     }
                 )
             );
+
+            option.AddConcurrencyLimiter("concurrency", options =>
+            {
+                options.PermitLimit = 100; // only one request at a time
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request will be processed first
+                options.QueueLimit = 10; // maximum number of requests that can be queued
+            });
         });
 
         services
@@ -106,6 +113,7 @@ public static class Dependencies
 
         return services;
     }
+
 
     private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, string hangFireConnection)
     {

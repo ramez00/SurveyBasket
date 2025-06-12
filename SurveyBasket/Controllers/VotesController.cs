@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace SurveyBasket.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
+[EnableRateLimiting("concurrency")]
 public class VotesController(IQuestionService questionService,IVoteServices voteServices) : ControllerBase
 {
     private readonly IQuestionService _questionService = questionService;
