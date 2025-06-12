@@ -55,41 +55,7 @@ public static class Dependencies
             .AddUrlGroup( new Uri("https://www.faceBook.com"),"MetaApi",tags: ["API"]) // if I have another external API 
             .AddCheck<MailServiceHealthCheck>("Mail Service", tags: ["mail"]); // add Health Check for Mail Service
 
-        services.AddRateLimiter(option =>
-        {
-            option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
-
-            option.AddPolicy("ipLimit", httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 2,                            // number of allowance request per time
-                        Window = TimeSpan.FromSeconds(20),   // time to allow request
-                    }
-                )
-            );
-
-            // wanna to add rate limit for specific user
-            // if user not login or not authenticated we will use anonymous user
-            option.AddPolicy("userLimit", httpContext =>
-                RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.User.GetUserId() ?? "anonymous",
-                    factory: _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = 5,                             // number of allowance request per time => when client send 5 request will blocked based on time below
-                        Window = TimeSpan.FromSeconds(30),    // time to allow request
-                    }
-                )
-            );
-
-            option.AddConcurrencyLimiter("concurrency", options =>
-            {
-                options.PermitLimit = 100; // only one request at a time
-                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request will be processed first
-                options.QueueLimit = 10; // maximum number of requests that can be queued
-            });
-        });
+       
 
         services
                 .AddBackgroundJobsConfig(hangFireConnection)
@@ -108,12 +74,54 @@ public static class Dependencies
                 .AddScoped<IUserService, UserService>()
                 .AddFluentValidationConfig()
                 .AddExceptionHandler<GlobalExceptionHandler>()
-                .AddProblemDetails();
+                .AddProblemDetails()
+                .AddRateLimiter();
 
 
         return services;
     }
 
+
+    private static IServiceCollection AddRateLimiter(this IServiceCollection services)
+    {
+        services.AddRateLimiter(option =>
+        {
+            option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
+
+            option.AddPolicy(RateLimiterConstant.IpRateLimiter, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,                            // number of allowance request per time
+                        Window = TimeSpan.FromSeconds(20),   // time to allow request
+                    }
+                )
+            );
+
+            // wanna to add rate limit for specific user
+            // if user not login or not authenticated we will use anonymous user
+            option.AddPolicy(RateLimiterConstant.UserRateLimiter, httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.GetUserId() ?? "anonymous",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,                             // number of allowance request per time => when client send 5 request will blocked based on time below
+                        Window = TimeSpan.FromSeconds(30),    // time to allow request
+                    }
+                )
+            );
+
+            option.AddConcurrencyLimiter(RateLimiterConstant.ConcurrencyLimiter, options =>
+            {
+                options.PermitLimit = 100; // only one request at a time
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request will be processed first
+                options.QueueLimit = 10; // maximum number of requests that can be queued
+            });
+        });
+
+        return services;
+    }
 
     private static IServiceCollection AddBackgroundJobsConfig(this IServiceCollection services, string hangFireConnection)
     {

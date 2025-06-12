@@ -7,7 +7,7 @@ using SurveyBasket.Authentication;
 namespace SurveyBasket.Controllers;
 [Route("[controller]")]
 [ApiController]
-[EnableRateLimiting("ipLimit")]
+[EnableRateLimiting(RateLimiterConstant.IpRateLimiter)]
 public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtoption) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
