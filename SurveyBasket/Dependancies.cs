@@ -64,10 +64,22 @@ public static class Dependencies
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
                     factory: _ => new FixedWindowRateLimiterOptions
                     {
-                        PermitLimit = 2,
-                        Window = TimeSpan.FromSeconds(20),
+                        PermitLimit = 2,                            // number of allowance request per time
+                        Window = TimeSpan.FromSeconds(20),   // time to allow request
                     }
+                )
+            );
 
+            // wanna to add rate limit for specific user
+            // if user not login or not authenticated we will use anonymous user
+            option.AddPolicy("userLimit", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.GetUserId() ?? "anonymous",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,                             // number of allowance request per time => when client send 5 request will blocked based on time below
+                        Window = TimeSpan.FromSeconds(30),    // time to allow request
+                    }
                 )
             );
         });

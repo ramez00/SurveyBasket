@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Persistence;
 using System.Reflection;
@@ -22,6 +23,7 @@ public class PollsController(IPollServices polls) : ControllerBase
     }
 
     [HttpGet("Current")]
+    [EnableRateLimiting("userLimit")]
     public async Task<IActionResult> GetCurrent(CancellationToken token)
     {
         return Ok(await _pollService.GetCurretnAsync(token));
