@@ -59,14 +59,17 @@ public static class Dependencies
         {
             option.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // when u reached to maximun request
 
-            option.AddSlidingWindowLimiter("SlidingLimiter", options =>
-            {
-                options.PermitLimit = 10; // max request per user
-                options.Window = TimeSpan.FromMinutes(1); // time to reset the request
-                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst; // oldest request first
-                options.QueueLimit = 2; // max request in queue
-                options.SegmentsPerWindow = 2; // number of segments in the window
-            });
+            option.AddPolicy("ipLimit", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 2,
+                        Window = TimeSpan.FromSeconds(20),
+                    }
+
+                )
+            );
         });
 
         services

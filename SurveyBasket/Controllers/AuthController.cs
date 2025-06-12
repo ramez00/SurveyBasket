@@ -7,6 +7,7 @@ using SurveyBasket.Authentication;
 namespace SurveyBasket.Controllers;
 [Route("[controller]")]
 [ApiController]
+[EnableRateLimiting("ipLimit")]
 public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtoption) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
@@ -93,7 +94,6 @@ public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtopt
     }
 
     [HttpGet("test")]
-    [EnableRateLimiting("SlidingLimiter")]
     public IActionResult Test()
     {
         Thread.Sleep(6000); 
