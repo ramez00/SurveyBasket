@@ -5,4 +5,12 @@ public record PollsResponse(int Id,
     string Summary,
     bool IsPublished,
     DateOnly StartsAt,
-    DateOnly EndsAt);
+    DateOnly EndsAt
+);
+
+public record PollsResponseV2(int Id,
+    string Title,
+    string Summary,
+    DateOnly StartsAt,
+    DateOnly EndsAt
+);

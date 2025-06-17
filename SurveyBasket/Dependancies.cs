@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Asp.Versioning;
+using Hangfire;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,6 +28,17 @@ public static class Dependencies
         services.AddControllers();
         services.AddHybridCache();
         services.AddHttpContextAccessor();
+        services.AddApiVersioning(options =>
+        {
+            options.ApiVersionReader = new UrlSegmentApiVersionReader(); // to read version from URL segment (e.g., /api/v1/polls)
+            options.ReportApiVersions = true; // to report api version in response header
+            options.AssumeDefaultVersionWhenUnspecified = true; // if client not specify version we will use default version
+            options.DefaultApiVersion = new ApiVersion(1, 2); // default version
+        }).AddApiExplorer( Options  =>
+        {
+            Options.GroupNameFormat = "'v'V"; // to format version in the API explorer
+            Options.SubstituteApiVersionInUrl = true; // to substitute version in the URL
+        });
 
         services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
 
