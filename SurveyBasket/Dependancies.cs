@@ -30,7 +30,7 @@ public static class Dependencies
         services.AddHttpContextAccessor();
         services.AddApiVersioning(options =>
         {
-            options.ApiVersionReader = new QueryStringApiVersionReader("api-version"); // to read version from query string (e.g. ?api-version=1.0)
+            options.ApiVersionReader = new MediaTypeApiVersionReader("api-version"); // to read version from media type header (e.g. application/json;api-version=1.0)
             options.ReportApiVersions = true; // to report api version in response header
             options.AssumeDefaultVersionWhenUnspecified = true; // if client not specify version we will use default version
             options.DefaultApiVersion = new ApiVersion(1); // default version
