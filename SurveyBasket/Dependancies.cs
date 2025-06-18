@@ -34,6 +34,7 @@ public static class Dependencies
             options.ReportApiVersions = true; // to report api version in response header
             options.AssumeDefaultVersionWhenUnspecified = true; // if client not specify version we will use default version
             options.DefaultApiVersion = new ApiVersion(1); // default version
+            options.ReportApiVersions = true; // to report api version in response header
         }).AddApiExplorer( Options  =>
         {
             Options.GroupNameFormat = "'v'V"; // to format version in the API explorer

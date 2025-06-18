@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace SurveyBasket.Controllers;
 
-[ApiVersion(1)]
+[ApiVersion(1 , Deprecated = true)]
 [ApiVersion(2)]
 [Authorize]
 [Route("api/[controller]")]
