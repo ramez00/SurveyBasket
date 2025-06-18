@@ -30,10 +30,10 @@ public static class Dependencies
         services.AddHttpContextAccessor();
         services.AddApiVersioning(options =>
         {
-            options.ApiVersionReader = new UrlSegmentApiVersionReader(); // to read version from URL segment (e.g., /api/v1/polls)
+            options.ApiVersionReader = new HeaderApiVersionReader("api-version"); // to read version from URL segment (e.g., /api/v1/polls)
             options.ReportApiVersions = true; // to report api version in response header
             options.AssumeDefaultVersionWhenUnspecified = true; // if client not specify version we will use default version
-            options.DefaultApiVersion = new ApiVersion(1, 2); // default version
+            options.DefaultApiVersion = new ApiVersion(1); // default version
         }).AddApiExplorer( Options  =>
         {
             Options.GroupNameFormat = "'v'V"; // to format version in the API explorer

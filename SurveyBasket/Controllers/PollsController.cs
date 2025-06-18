@@ -13,7 +13,7 @@ namespace SurveyBasket.Controllers;
 [ApiVersion(1)]
 [ApiVersion(2)]
 [Authorize]
-[Route("api/v{v:apiVersion}/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class PollsController(IPollServices polls) : ControllerBase
 {
