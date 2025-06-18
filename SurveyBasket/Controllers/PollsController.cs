@@ -25,6 +25,7 @@ public class PollsController(IPollServices polls) : ControllerBase
         return Ok(await _pollService.GetAllAsync(token));
     }
 
+    [AllowAnonymous]
     [MapToApiVersion(1)]
     [HttpGet("Current")]
     [EnableRateLimiting(RateLimiterConstant.UserRateLimiter)]
@@ -33,6 +34,7 @@ public class PollsController(IPollServices polls) : ControllerBase
         return Ok(await _pollService.GetCurretnAsync(token));
     }
 
+    [AllowAnonymous]
     [MapToApiVersion(2)]
     [HttpGet("Current")]
     [EnableRateLimiting(RateLimiterConstant.UserRateLimiter)]
