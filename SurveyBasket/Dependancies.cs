@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SurveyBasket.Authentication;
 using SurveyBasket.Errors;
 using SurveyBasket.Health;
@@ -66,6 +67,7 @@ public static class Dependencies
             .AddHangfire(Options => { Options.MinimumAvailableServers = 1; })
             .AddUrlGroup( new Uri("https://www.google.com"),"GoogleAPI",tags : ["API"]) // add Health Check for external API
             .AddUrlGroup( new Uri("https://www.faceBook.com"),"MetaApi",tags: ["API"]) // if I have another external API 
+            .AddUrlGroup( new Uri("https://les-dev.net/"),"LesCompany",tags: ["Company Support"]) // if I have another external API 
             .AddCheck<MailServiceHealthCheck>("Mail Service", tags: ["mail"]); // add Health Check for Mail Service
 
        
@@ -154,7 +156,26 @@ public static class Dependencies
     private static IServiceCollection AddSewagerConfig(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Survey Basket API",
+                Description = "This is the API for Survey Basket application.",
+                TermsOfService = new Uri("https://example.com/terms"),
+                Contact = new OpenApiContact
+                {
+                    Name = "LES-DEV",
+                    Url = new Uri("https://les-dev.net")
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "Example License",
+                    Url = new Uri("https://les-dev.net/#contact")
+                }
+            });
+        });
         return services;
     }
 
