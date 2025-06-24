@@ -175,7 +175,10 @@ public static class Dependencies
                     Url = new Uri("https://les-dev.net/#contact")
                 }
             });
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
+
         return services;
     }
 

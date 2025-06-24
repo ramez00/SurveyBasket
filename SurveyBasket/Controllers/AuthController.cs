@@ -8,12 +8,31 @@ namespace SurveyBasket.Controllers;
 [Route("[controller]")]
 [ApiController]
 [EnableRateLimiting(RateLimiterConstant.IpRateLimiter)]
+[Produces("application/json")]
 public class AuthController(IAuthService authService,IOptions<JwtOptions> jwtoption) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
     private readonly JwtOptions _jwtoption = jwtoption.Value;
 
+    /// <summary>
+    /// Allow users to login with email and password.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Return JWT token if credentials were valid</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /Todo
+    ///     {
+    ///        "Email": "example@gmail.com",
+    ///        "Password": "*****"
+    ///     }
+    ///
+    /// </remarks>
     [HttpPost("")]
+    [ProducesResponseType(typeof(AuthResponse),StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails),StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login(AuthRequest request,CancellationToken cancellationToken)
     {
         var authRes = await _authService.GetTokenAsync(request.Email, request.Password,cancellationToken);
