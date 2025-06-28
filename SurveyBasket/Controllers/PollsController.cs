@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Persistence;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Reflection;
 
 namespace SurveyBasket.Controllers;
@@ -18,6 +19,15 @@ namespace SurveyBasket.Controllers;
 public class PollsController(IPollServices polls) : ControllerBase
 {
     private readonly IPollServices _pollService = polls;
+
+
+    [HttpGet("GetAPIVersion")]
+    [SwaggerIgnore]
+    public IActionResult GetApiVersion(CancellationToken token)
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
+        return Ok(new { Version = version });
+    }
 
     [HttpGet("")]
     public async Task<IActionResult> GetAll(CancellationToken token)
