@@ -23,7 +23,7 @@ public class ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) : 
             Name = "Authorization",
             Description = "Please Add your token",
             In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
+            Type = SecuritySchemeType.Http,
             Scheme = JwtBearerDefaults.AuthenticationScheme,
             BearerFormat = "JWT",
         });
