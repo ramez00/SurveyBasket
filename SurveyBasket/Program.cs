@@ -30,7 +30,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI( options =>
+    {
+        var description = app.DescribeApiVersions();
+        foreach (var item in description)
+            options.SwaggerEndpoint($"/swagger/{item.GroupName}/swagger.json", item.GroupName.ToUpperInvariant());
+    });
 }
 
 app.UseSerilogRequestLogging();

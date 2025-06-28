@@ -15,6 +15,8 @@ using SurveyBasket.Errors;
 using SurveyBasket.Health;
 using SurveyBasket.Persistence;
 using SurveyBasket.Settings;
+using SurveyBasket.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Text;
@@ -158,26 +160,11 @@ public static class Dependencies
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Version = "v1",
-                Title = "Survey Basket API",
-                Description = "This is the API for Survey Basket application.",
-                TermsOfService = new Uri("https://example.com/terms"),
-                Contact = new OpenApiContact
-                {
-                    Name = "LES-DEV",
-                    Url = new Uri("https://les-dev.net")
-                },
-                License = new OpenApiLicense
-                {
-                    Name = "Example License",
-                    Url = new Uri("https://les-dev.net/#contact")
-                }
-            });
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
+
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
         return services;
     }
